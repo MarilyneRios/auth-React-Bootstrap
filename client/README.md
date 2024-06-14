@@ -146,12 +146,14 @@ import About from './pages/About';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Profile from './pages/Profile';
+import Header from './components/Header';
 //styles
 import './App.css'
 
 function App() {
   return (
     <BrowserRouter>
+    <Header/>
     <Routes>
     <Route path='/' element={<Home />} />
       <Route path='/about' element={<About />} />
@@ -164,6 +166,7 @@ function App() {
 }
 
 export default App;
+
 ````
 
 4. tester les routes avec le navigateur:

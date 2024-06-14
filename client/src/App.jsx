@@ -1,20 +1,25 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import Profile from './pages/Profile';
 import Header from './components/Header';
 //styles
 import './App.css'
-//test bootstrap
-import Button from 'react-bootstrap/Button';
-import { BsArrowThroughHeartFill } from "react-icons/bs";
 
 function App() {
   return (
-    <div>
+    <BrowserRouter>
     <Header/>
-    <div className='d-flex flex-column align-items-center justify-content-center' style={{ minHeight: '100vh', gap: '20px' }}>
-      <h1 className='display-1 text-center'>App test</h1>
-      <Button variant="outline-primary">Primary</Button>
-      <BsArrowThroughHeartFill color='red' size='25' />
-    </div>
-    </div>
+    <Routes>
+    <Route path='/' element={<Home />} />
+      <Route path='/about' element={<About />} />
+      <Route path='/sign-in' element={<SignIn />} />
+      <Route path='/sign-up' element={<SignUp />} />
+      <Route path='/profile' element={<Profile />} />
+    </Routes>
+   </BrowserRouter>
   )
 }
 

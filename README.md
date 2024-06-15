@@ -448,3 +448,49 @@ app.use('/api/user', userRoutes);
 http://localhost:3000/api/user
 
 Vous devez lire quelque comme ceci :{"message":"hello world on api/user"}
+
+> Pour avoir une meilleure pratique, il faut décomposer les étapes avec userRoutes.js et userController.js
+ - userRoutes.js  est responsable de la définition des routes/endpoints de votre API. Chaque route est associée à une fonction spécifique dans le contrôleur correspondant. 
+ 
+ (Par exemple, la route GET ‘/’ est associée à la fonction display du contrôleur utilisateur.)
+
+ - userController.js contient les fonctions qui sont exécutées lorsque les routes correspondantes sont appelées. Ces fonctions = logique métier de votre application.
+ 
+  (Par exemple, la fonction display renvoie un message JSON lorsque la route GET ‘/’ est appelée.)
+
+5. mkdir controllers dans api
+
+Les contrôleurs sont responsables de traiter les requêtes, interagir avec les modèles (base de données), et renvoyer les réponses appropriées.
+
+6. touch userController.js dans controller
+
+7. code :
+
+````
+// dans userController.js
+
+export const display = (req, res) => {
+    res.json({
+      message: 'hello world on api/userRoutes and userController',
+    });
+};
+````
+
+````
+// dans userRoutes.js
+
+import express from 'express';
+import {display} from '../controllers/userController.js'
+
+const router = express.Router();
+
+router.get('/', display);
+
+export default router;
+````
+
+8. test
+
+http://localhost:3000/api/user 
+
+=> hello world on api/userRoutes and userController

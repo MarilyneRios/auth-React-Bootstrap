@@ -269,3 +269,44 @@ app.get('/', function(req, res) {
 
 - dans le navigateur -> localhost:3000 : hello world
 
+
+# Cacher les données sensibles
+
+1. Copier le .gitignore du dossier client et le mettre à la racine
+
+Puis, y écrire .env dans les 2 .gitignore
+
+2. installer dotenv
+
+https://www.npmjs.com/package/dotenv
+
+npm install dotenv --save
+
+3. touch .env à la racine
+
+````
+PORT=3000
+````
+
+4. index.js
+
+````
+import express from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
+const app = express();
+const port = process.env.PORT
+
+// server on port process.env.PORT
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+
+// respond with "hello world" when a GET request is made to the homepage
+app.get('/', function(req, res) {
+    res.send('hello world');
+  });
+````
+
+5. Tester le serveur et tester le git push afin de s'assurer que le .env soit inexistant sur le dépôt.

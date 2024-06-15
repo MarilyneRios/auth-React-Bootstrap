@@ -38,7 +38,7 @@ function App() {
 export default App
 ````
 
-# Bootstrap
+## Bootstrap
 
 https://react-bootstrap.github.io/docs/getting-started/introduction
 
@@ -116,7 +116,7 @@ function App() {
 export default App;
 ````
 
-# Organisation src
+## Organisation src
 
 1. pages
 
@@ -174,7 +174,7 @@ http://localhost:5173/about puis
 http://localhost:5173/profile ect...
 
 
-# index.html
+## index.html
 
 ````
 <!doctype html>
@@ -270,7 +270,7 @@ app.get('/', function(req, res) {
 - dans le navigateur -> localhost:3000 : hello world
 
 
-# Cacher les données sensibles
+## Cacher les données sensibles
 
 1. Copier le .gitignore du dossier client et le mettre à la racine
 
@@ -310,3 +310,54 @@ app.get('/', function(req, res) {
 ````
 
 5. Tester le serveur et tester le git push afin de s'assurer que le .env soit inexistant sur le dépôt.
+
+## connecter à MongoDB
+
+1. mkdir config dans api
+
+2. touch db.js dans config
+
+````
+import mongoose from 'mongoose';
+
+const connectDB = async () => {
+try {
+    const conn = await mongoose.connect(process.env.VITE_DB_CONNECTION_STRING);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+} catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+}
+};
+
+export default connectDB;
+
+````
+
+2. Dans .env
+
+VITE_DB_CONNECTION_STRING="votre lien de connexion mongoDB/nom_de_App"
+
+3. Dans index.js
+
+````
+import connectDB from './config/db.js';
+
+
+connectDB();
+````
+
+4. Installer mongoose à la racine 
+
+Pourquoi à la racine ? 
+Parce que le package.json du serveur est à la racine.
+
+https://www.npmjs.com/package/mongoose 
+
+- npm install mongoose
+
+5. Vérification dans le terminal :
+
+Server listening on port 3000 
+
+MongoDB Connected:.......mongodb.net

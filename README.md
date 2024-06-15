@@ -412,3 +412,39 @@ const User = mongoose.model('User', userSchema);
 export default User;
 ````
 { timestamps: true } => ajoute automatiquement deux champs au schéma : createdAt et updatedAt
+
+## route API
+
+1. Organisation :
+
+- mkdir routes dans api
+- cd routes
+- touch userRoutes.js
+
+2. userRoutes.js
+
+```` import express from 'express';
+
+ const router = express.Router();
+
+ router.get('/', (req, res) => {
+     res.json({message :'hello world'});
+   });
+
+ export default router;
+````
+
+3. index.js :
+
+````
+import userRoutes from './routes/userRoute.js'
+
+//routes
+app.use('/api/user', userRoutes);
+````
+
+4. tester la route
+
+http://localhost:3000/api/user
+
+Vous devez lire quelque comme ceci :{"message":"hello world on api/user"}

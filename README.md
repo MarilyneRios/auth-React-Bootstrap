@@ -361,3 +361,54 @@ https://www.npmjs.com/package/mongoose
 Server listening on port 3000 
 
 MongoDB Connected:.......mongodb.net
+
+6.  Vérification dans le package.json
+
+"mongoose": "^8.4.1"
+
+
+## User model
+
+1. organisation :
+
+- mkdir models dans api
+- cd models
+-  touch userModel.js
+
+2. userModel.js :
+
+````
+import mongoose from 'mongoose';
+
+// Définition du Schéma user
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    profilePicture: {
+      type: String,
+      default:
+        'https://img.freepik.com/premium-vector/man-avatar-profile-picture-vector-illustration_268834-538.jpg',
+    },
+  },
+  { timestamps: true }
+);
+
+//  Création du Modèle user
+const User = mongoose.model('User', userSchema);
+
+export default User;
+````
+{ timestamps: true } => ajoute automatiquement deux champs au schéma : createdAt et updatedAt

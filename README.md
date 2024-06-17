@@ -494,3 +494,116 @@ export default router;
 http://localhost:3000/api/user 
 
 => hello world on api/userRoutes and userController
+
+
+# SignUp avec auth API route
+
+1. Pour le système d'authentification, on crée 2 fichiers:
+
+- authRoute.js
+
+````
+//authRoutes
+
+import express from 'express';
+import { signin, signup, signout } from '../controllers/authControllers.js';
+
+const router = express.Router();
+
+router.post('/signup', signup);
+router.post('/signin', signin);
+router.get('/signout', signout);
+
+export default router;
+
+````
+
+- authControllers.js
+
+````
+//authControllers.js
+import User from '../models/userModel.js';
+
+export const display = (req, res) => {
+    res.json({
+        message: 'hello world on api/authRoutes and authControllers',
+    });
+};
+
+export const signup = async (req, res, next) => {
+    try {
+        console.log(req.body);
+        res.status(200).json({
+            message: 'Inscription réussie',
+            data: {
+                username: req.body.username,
+                email: req.body.email,
+                password: req.body.password
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const signin = async (req, res, next) => {
+    console.log(req.body);
+    res.json({
+        message: 'Connexion réussie',
+        data: req.body
+    });
+};
+
+export const signout = (req, res) => {
+    console.log(req.body);
+    res.json({
+        message: 'Déconnexion réussie'
+    });
+};
+
+````
+
+
+2. index.js
+
+Ajouter la route authRoutes :
+
+````
+import authRoutes from './routes/authRoute.js';
+
+app.use('/api/auth', authRoutes);
+````
+
+3. test
+
+thunderClient > body >json
+
+{
+  "username": "user1",
+  "email": "user1@email.com",
+  "password": "password123"
+}
+
+**post** **http://localhost:3000/api/auth/signup** => undefined
+
+faut ajouter dans **index.js** : **app.use(express.json());** pour permettre d'accéder directement aux données JSON via req.body.
+
+    Dans la console :
+
+{
+  "username": "user1",
+  "email": "user1@email.com",
+  "password": "password123"
+}
+
+    Dans thunderClient: on va la réponse : Status: 200 OK 
+  ```` 
+  {
+    "message": "Inscription réussie",
+    "data": {
+      "username": "user1",
+      "email": "user1@email.com",
+      "password": "password123"
+    }
+  }
+````

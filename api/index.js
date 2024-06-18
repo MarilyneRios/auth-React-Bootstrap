@@ -14,15 +14,20 @@ const port = process.env.PORT || 3000;
 app.use(express.json()); 
 
 
-//routes
+//Routes
 app.use('/api/user', userRoutes);  
 app.use('/api/auth', authRoutes);
 
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
-    console.error(err.message);
-    res.status(500).json({ message: 'Erreur du serveur' });
-});
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    return res.status(statusCode).json({
+      success: false,
+      message,
+      statusCode,
+    });
+  });
 
 // serveur sur le port process.env.PORT
 app.listen(port, () => {

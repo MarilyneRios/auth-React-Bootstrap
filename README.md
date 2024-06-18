@@ -496,7 +496,7 @@ http://localhost:3000/api/user
 => hello world on api/userRoutes and userController
 
 
-# SignUp avec auth API route
+## SignUp avec auth API route
 
 1. Pour le système d'authentification, on crée 2 fichiers:
 
@@ -664,6 +664,13 @@ npm install bcryptjs
 
 2. authController
 
+**const hashedPassword = bcryptjs.hashSync(password, 10);** 
+=> La fonction **hashSync** de la bibliothèque bcryptjs prend 2 paramètres : 
+
+- **password** (qui est le mot de passe à hacher). 
+
+- **10** (qui est le nombre de tours de hachage). 
+
 ````
 import bcryptjs from 'bcryptjs';
 
@@ -710,3 +717,59 @@ password
 "$2a$10$XJx3p2gpQziexOCSiQgCXeWO2kpvYvoK64MUC/XEux.gdqTF5YeOG"
 
 ````
+
+## Créer un middleware errors
+
+1. Créer un dossier utils ou middlewares
+
+2. Puis un fichier error.js
+
+- Cette fonction crée un nouvel objet d’erreur avec  2 paramètres : **statusCode** (qui représente le code d’état HTTP) et **message** (qui est le message d’erreur).
+
+- La fonction retourne cet objet d’erreur, qui peut ensuite être utilisé pour gérer les erreurs dans ton code.
+
+
+export const errorHandler = (statusCode, message) => {
+  const error = new Error();
+  error.statusCode = statusCode;
+  error.message = message;
+  return error;
+};
+
+et dans index.js ajouter :
+
+````
+// Middleware de gestion des erreurs
+  app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    return res.status(statusCode).json({
+      success: false,
+      message,
+      statusCode,
+    });
+  });
+````
+Identification de l'erreur : Si quelque chose ne va pas, comme un nom d'utilisateur incorrect ou un problème de connexion à la base de données, cette erreur est capturée et envoyée à ce middleware.
+
+Préparation de la réponse : Le middleware vérifie l'erreur et obtient des détails comme le code d'erreur (par exemple, 404 pour "introuvable") et un message explicatif.
+
+Envoi de la réponse : Ensuite, il envoie une réponse JSON contenant ces détails à l'utilisateur, afin qu'il sache ce qui s'est passé.
+
+3. Test avec insomnia :
+
+Pour :
+{
+  "username": "user3",
+  "email": "user3@email.com",
+  "password": "user3@email.com"
+}
+
+On obtient :
+{
+	"success": false,
+	"message": "E11000 duplicate key error collection: mern-auth-bootstrap.users index: username_1 dup key: { username: \"user3\" }",
+	"statusCode": 500
+}
+
+## signIn route

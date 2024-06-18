@@ -772,4 +772,136 @@ On obtient :
 	"statusCode": 500
 }
 
-## signIn route
+Pour en savoir plus à propos des stautscode:
+
+https://developer.mozilla.org/fr/docs/Web/HTTP/Status
+
+
+//-------------------------
+
+#  Frontend page
+
+## Style Header
+
+````
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import { FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
+import Button from "react-bootstrap/Button";
+
+function Header() {
+  return (
+    <Navbar expand="lg" bg="light" variant="light" data-bs-theme="light">
+      <Container fluid>
+        <Navbar.Brand href="#home">Auth React-Bootstrap</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto mb-2 mb-lg-0">
+            <Nav.Link href="#home" className="my-auto">
+              Home
+            </Nav.Link>
+            <Nav.Link href="#link" className="my-auto">
+              Link
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto mb-2 mb-lg-0">
+            <Nav.Link href="#sign-up">
+              <Button variant="outline-success" className="mx-1">
+                <FaSignOutAlt />
+                Inscription
+              </Button>
+            </Nav.Link>
+            <Nav.Link href="#sign-in">
+              <Button variant="outline-success" className="mx-1">
+                <FaSignInAlt /> Connexion
+              </Button>
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
+}
+
+export default Header;
+
+// Pour afficher le nom du user qaund connecté
+/**
+ <Navbar.Collapse className="justify-content-end">
+    <Navbar.Text>
+      Signed in as: <a href="#login">Mark Otto</a>
+    </Navbar.Text>
+ </Navbar.Collapse>
+ */
+
+````
+
+## SignUp page
+
+### Hero component
+
+**Hero** peut être réutilisé sur différentes pages avec des contenus ou des styles différents.
+
+**Avantage** : 
+- Toutes modifications du style ou au comportement de votre section hero, ce fait en un seul endroit, et ces changements seront reflétés partout où le composant est utilisé.
+
+- Harmonisation du style.
+
+1. Hero.jsx
+````
+import { Container, Card, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+
+export default function Hero() {
+  return (
+    <div className=' py-5'>
+    <Container className='d-flex justify-content-center'>
+        <Card className='p-5 d-flex flex-column align-items-center hero-card bg-light w-75 border border-success'>
+                <h1 className='text-center mb-4 text-success'> Bienvenue sur cette application MERN (MongoDB, Express, React,
+                Node.js) avec Bootstrap.</h1>
+            <p className='text-center mb-4'>
+            Ceci est un modèle d&lsquo; application Web full-stack construite avec
+          des fonctionnalités d&lsquo;authentification (JWT) qui peut vous servir de
+          template (starter) afin de créer votre APP.
+            </p>
+            <p className='text-center mb-4'>
+            Elle permet aux utilisateurs de s&lsquo;inscrire, de se connecter et de
+          se déconnecter, et donne accès à itinéraires protégés uniquement pour
+          les utilisateurs authentifiés.
+            </p>
+            <div className='d-flex'>
+                <Link to='/sign-in'>
+                    <Button variant='outline-success'  className='me-3'>
+                        Connexion
+                    </Button>
+                </Link>
+                <Link to='/sign-up'>
+                    <Button variant='outline-success'>
+                        Inscription
+                    </Button>
+                </Link>
+            </div>
+        </Card>
+    </Container>
+ </div>
+  )
+}
+````
+2. Home.jsx
+
+````
+import Hero from "../components/Hero";
+
+export default function Home() {
+  return (
+    <div>
+      <Hero />
+    </div>
+  );
+}
+
+````

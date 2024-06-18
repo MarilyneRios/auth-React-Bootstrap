@@ -6,11 +6,15 @@ export const display = (req, res) => {
     });
 };
 
-export const signup = (req, res) => {
-    console.log(req.body);
-    res.json({
-        message: 'Inscription réussie',
-    });
+export const signup = async (req, res, next) => {
+    const { username, email, password } = req.body;
+    const newUser = new User({ username, email, password});
+    try {
+        await newUser.save();
+        res.status(201).json({ message: 'Inscription réussie' });
+      } catch (error) {
+        next(error);
+      }
 };
 
 export const signin = (req, res) => {

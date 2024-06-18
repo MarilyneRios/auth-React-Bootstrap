@@ -597,3 +597,60 @@ Dans thunderClient: on va la réponse : Status: 200 OK
     }
   }
 ````
+### Sauver les données dans mongoDB
+
+1.authControllers.js -> signup
+
+````
+export const signup = async  (req, res) => {
+    //console.log(req.body);
+    const { username, email, password } = req.body;
+    const newUser = new User({ username, email, password });
+    await newUser.save();
+    res.json({
+        message: 'Inscription réussie',
+    });
+};
+````
+
+2. On test avec thunder ou insomnia ou autre : 
+- Dans le JSON:
+{
+  "username": "user2",
+  "email": "user2@email.com",
+  "password": "user2@email.com"
+}
+
+- La réponse:
+
+{
+	"message": "Inscription réussie"
+}
+
+3. vérifier dans mongoDB si cela a créer un new user.
+
+4. On peut tester les meg d'erreur :
+
+insomnia = Error: Failure when receiving data from the peer
+
+thunder client = usename unique ou requis... ex: errmsg: 'E11000 duplicate key error collection: basic-auth.users index: username_1 dup key: { username: "user1" }',
+
+5. Pour voir un  msg d'erreur 
+
+````
+export const signup = async (req, res, next) => {
+    const { username, email, password } = req.body;
+    const newUser = new User({ username, email, password});
+    try {
+        await newUser.save();
+        res.status(201).json({ message: 'Inscription réussie' });
+      } catch (error) {
+        next(error);
+      }
+};
+````
+{
+	"message": "Erreur du serveur"
+}
+
+### Pbm de mot de passe lisible dans MongoDB

@@ -633,8 +633,6 @@ export const signup = async  (req, res) => {
 
 insomnia = Error: Failure when receiving data from the peer
 
-thunder client = usename unique ou requis... ex: errmsg: 'E11000 duplicate key error collection: basic-auth.users index: username_1 dup key: { username: "user1" }',
-
 5. Pour voir un  msg d'erreur 
 
 ````
@@ -654,3 +652,61 @@ export const signup = async (req, res, next) => {
 }
 
 ### Pbm de mot de passe lisible dans MongoDB
+
+Ceci est un pbm car si qlq a acces à la dataBase, on peut lire les passwords des users. Et cela représente une faille de sécurité pour les informations sensibles des users.
+
+1. 
+    Crypter les passwords avec bcryptjs :
+
+https://www.npmjs.com/package/bcryptjs
+
+npm install bcryptjs
+
+2. authController
+
+````
+import bcryptjs from 'bcryptjs';
+
+export const signup = async (req, res, next) => {
+    const { username, email, password } = req.body;
+    const hashedPassword = bcryptjs.hashSync(password, 10);
+    const newUser = new User({ username, email, password: hashedPassword });
+    try {
+        await newUser.save();
+        res.status(201).json({ message: 'Inscription réussie' });
+      } catch (error) {
+        next(error);
+      }
+};
+````
+
+3. Test et lire dans mongoDB.
+
+- nouvelle saisie:
+{
+  "username": "user3",
+  "email": "user3@email.com",
+  "password": "user3@email.com"
+}
+
+- lire dans mongoDB et comparer le user2 et user3 et vérifier que le mot de passe du user3 soit crypté.
+
+````
+username
+"user2"
+email
+"user2@email.com"
+password
+"user2@email.com"
+
+````
+
+````
+username
+"user3"
+email
+"user3@email.com"
+password
+"$2a$10$XJx3p2gpQziexOCSiQgCXeWO2kpvYvoK64MUC/XEux.gdqTF5YeOG"
+
+````

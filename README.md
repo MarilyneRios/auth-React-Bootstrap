@@ -530,34 +530,24 @@ export const display = (req, res) => {
     });
 };
 
-export const signup = async (req, res, next) => {
-    try {
-        console.log(req.body);
-        res.status(200).json({
-            message: 'Inscription réussie',
-            data: {
-                username: req.body.username,
-                email: req.body.email,
-                password: req.body.password
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
+export const signup = (req, res) => {
+    console.log(req.body);
+    res.json({
+        message: 'Inscription réussie',
+    });
 };
 
-export const signin = async (req, res, next) => {
+export const signin = (req, res) => {
     console.log(req.body);
     res.json({
         message: 'Connexion réussie',
-        data: req.body
     });
 };
 
 export const signout = (req, res) => {
     console.log(req.body);
     res.json({
-        message: 'Déconnexion réussie'
+        message: 'Déconnexion réussie',
     });
 };
 
@@ -566,10 +556,12 @@ export const signout = (req, res) => {
 
 2. index.js
 
-Ajouter la route authRoutes :
-
+Ajouter la route authRoutes et app.use(express.json())
+(pour permettre d'accéder directement aux données JSON via req.body.)
 ````
 import authRoutes from './routes/authRoute.js';
+
+app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 ````
@@ -584,11 +576,9 @@ thunderClient > body >json
   "password": "password123"
 }
 
-**post** **http://localhost:3000/api/auth/signup** => undefined
+**post** **http://localhost:3000/api/auth/signup** 
 
-faut ajouter dans **index.js** : **app.use(express.json());** pour permettre d'accéder directement aux données JSON via req.body.
-
-    Dans la console :
+Dans la console :
 
 {
   "username": "user1",
@@ -596,7 +586,7 @@ faut ajouter dans **index.js** : **app.use(express.json());** pour permettre d'a
   "password": "password123"
 }
 
-    Dans thunderClient: on va la réponse : Status: 200 OK 
+Dans thunderClient: on va la réponse : Status: 200 OK 
   ```` 
   {
     "message": "Inscription réussie",

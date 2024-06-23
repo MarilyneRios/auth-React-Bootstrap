@@ -1,5 +1,6 @@
 import { Container, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
 
 export default function Hero() {
   return (
@@ -21,12 +22,12 @@ export default function Hero() {
             <div className='d-flex'>
                 <Link to='/sign-in'>
                     <Button variant='outline-success'  className='me-3'>
-                        Connexion
+                    <FaSignInAlt /> Connexion
                     </Button>
                 </Link>
                 <Link to='/sign-up'>
                     <Button variant='outline-success'>
-                        Inscription
+                    <FaSignOutAlt /> Inscription
                     </Button>
                 </Link>
             </div>

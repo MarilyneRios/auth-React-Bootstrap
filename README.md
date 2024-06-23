@@ -789,33 +789,34 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
 
 function Header() {
   return (
-    <Navbar expand="lg" bg="light" variant="light" data-bs-theme="light">
+    <Navbar expand="lg" bg="light" variant="light" data-bs-theme="light" className="border-bottom border-success">
       <Container fluid>
-        <Navbar.Brand href="#home">Auth React-Bootstrap</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/" className="text-success fs-4">Auth React-Bootstrap</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto mb-2 mb-lg-0">
-            <Nav.Link href="#home" className="my-auto">
+            <Nav.Link as={Link}  to="/" className="my-auto">
               Home
             </Nav.Link>
-            <Nav.Link href="#link" className="my-auto">
-              Link
+            <Nav.Link as={Link}  to="/about" className="my-auto">
+              A propos
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto mb-2 mb-lg-0">
-            <Nav.Link href="#sign-up">
+            <Nav.Link as={Link}  to="/sign-up">
               <Button variant="outline-success" className="mx-1">
                 <FaSignOutAlt />
                 Inscription
               </Button>
             </Nav.Link>
-            <Nav.Link href="#sign-in">
+            <Nav.Link as={Link}  to="/sign-in">
               <Button variant="outline-success" className="mx-1">
                 <FaSignInAlt /> Connexion
               </Button>
@@ -828,6 +829,16 @@ function Header() {
 }
 
 export default Header;
+
+// Pour afficher le nom du user qaund connecté
+/**
+ <Navbar.Collapse className="justify-content-end">
+    <Navbar.Text>
+      Signed in as: <a href="#login">Mark Otto</a>
+    </Navbar.Text>
+ </Navbar.Collapse>
+ */
+
 
 // Pour afficher le nom du user qaund connecté
 /**
@@ -905,4 +916,62 @@ export default function Home() {
 }
 
 ````
-# 
+# Test amélioration 
+
+Utilisation react-router-dom pour la gestion des routes imbriquées, tout en ajoutant la persistance de l'état global avec redux-persist.
+
+
+## App.jsx
+````
+import { Outlet } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Header from './components/Header';
+
+function App() {
+  return (
+    <>
+      <Header />
+      <ToastContainer />
+      <Container className='my-2'>
+        <Outlet />
+      </Container>
+    </>
+  );
+}
+
+export default App;
+````
+npm install --save react-toastify
+
+## SignIn et SignUP UI
+
+### FormContainer
+
+Modèle de mise en forme pour les formulaires de SignIn et SignUP
+
+````
+import { Container, Row, Col } from 'react-bootstrap';
+
+const FormContainer = ({ children }) => {
+  return (
+    // Centrer et Aligner le contenu
+    <Container>
+    {/** Créer une ligne dans le système de grille de Bootstrap */}
+      <Row className='justify-content-md-center mt-5'>
+      {/** Créer une colonne dans le système de grille de Bootstrap */}
+      {/** Pour petits écrans (xs) => 12 colonnes  */}
+      {/** Pour petits écrans (md) => 6 colonnes  */}
+        <Col xs={12} md={6} className='card p-5'>
+              {children}
+        </Col>
+      </Row>
+    </Container>
+  );
+};
+
+export default FormContainer;
+````
+
+**children** = propriété spéciale en React pour passer des composants comme données à d'autres composants 

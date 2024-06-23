@@ -1,3 +1,4 @@
+/*
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -21,6 +22,27 @@ function App() {
     </Routes>
    </BrowserRouter>
   )
+}
+
+export default App;
+*/
+
+import { Outlet } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Header from './components/Header';
+
+function App() {
+  return (
+    <>
+      <Header />
+      <ToastContainer />
+      <Container className='my-2'>
+        <Outlet />
+      </Container>
+    </>
+  );
 }
 
 export default App;

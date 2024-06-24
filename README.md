@@ -1313,6 +1313,7 @@ dans la console.log :
 {message: 'Inscription réussie'}
 
 dans mongoDB vérifier que le nouveau user est créé.
+````
 _id
 ObjectId('gugourgguorhoiughiorhgihrihgioh')
 username
@@ -1327,5 +1328,5 @@ createdAt
 2024-06-24T08:42:54.952+00:00
 updatedAt
 2024-06-24T08:42:54.952+00:00
-
+````
 

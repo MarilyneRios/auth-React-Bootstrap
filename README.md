@@ -793,35 +793,60 @@ import { Link } from "react-router-dom";
 
 function Header() {
   return (
-    <Navbar expand="lg" bg="light" variant="light" data-bs-theme="light" className="border-bottom border-success">
+    <Navbar
+      expand="lg"
+      bg="light"
+      variant="light"
+      data-bs-theme="light"
+      className="border-bottom border-success"
+    >
       <Container fluid>
-        <Navbar.Brand as={Link} to="/" className="text-success fs-4">Auth React-Bootstrap</Navbar.Brand>
+        {/** Titre */}
+        <Navbar.Brand as={Link} to="/" className="text-success fs-4">
+          Auth React-Bootstrap
+        </Navbar.Brand>
+
+        {/** Btns on small screens */}
+        <div className="d-lg-none d-flex align-items-center">
+          <Nav.Link as={Link} to="/sign-in" className="p-0">
+            <Button variant="success" className="mx-1">
+              <FaSignInAlt /> Connexion
+            </Button>
+          </Nav.Link>
+          <Nav.Link as={Link} to="/sign-up" className="p-0">
+            <Button variant="outline-success" className="mx-1">
+              <FaSignOutAlt /> Inscription
+            </Button>
+          </Nav.Link>
+        </div>
+
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto mb-2 mb-lg-0">
-            <Nav.Link as={Link}  to="/" className="my-auto">
-              Home
-            </Nav.Link>
-            <Nav.Link as={Link}  to="/about" className="my-auto">
-              A propos
-            </Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto mb-2 mb-lg-0">
-            <Nav.Link as={Link}  to="/sign-up">
-              <Button variant="outline-success" className="mx-1">
-                <FaSignOutAlt />
-                Inscription
-              </Button>
-            </Nav.Link>
-            <Nav.Link as={Link}  to="/sign-in">
-              <Button variant="outline-success" className="mx-1">
+        {/** Liens and buttons on large screens */}
+        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between w-100">
+          <div className="d-flex justify-content-center flex-grow-1">
+            <Nav className="mx-auto mb-2 mb-lg-0">
+              <Nav.Link as={Link} to="/" className="my-auto">
+                Home
+              </Nav.Link>
+              <Nav.Link as={Link} to="/about" className="my-auto">
+                A propos
+              </Nav.Link>
+            </Nav>
+          </div>
+
+          <div className="d-none d-lg-flex align-items-center">
+            <Nav.Link as={Link} to="/sign-in" className="p-0">
+              <Button variant="success" className="mx-1">
                 <FaSignInAlt /> Connexion
               </Button>
             </Nav.Link>
-          </Nav>
+            <Nav.Link as={Link} to="/sign-up" className="p-0">
+              <Button variant="outline-success" className="mx-1">
+                <FaSignOutAlt /> Inscription
+              </Button>
+            </Nav.Link>
+          </div>
         </Navbar.Collapse>
       </Container>
     </Navbar>
@@ -829,16 +854,6 @@ function Header() {
 }
 
 export default Header;
-
-// Pour afficher le nom du user qaund connecté
-/**
- <Navbar.Collapse className="justify-content-end">
-    <Navbar.Text>
-      Signed in as: <a href="#login">Mark Otto</a>
-    </Navbar.Text>
- </Navbar.Collapse>
- */
-
 
 // Pour afficher le nom du user qaund connecté
 /**
@@ -1101,25 +1116,7 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
-
-    switch (id) {
-      case "username":
-        setUsername(value);
-        break;
-      case "email":
-        setEmail(value);
-        break;
-      case "password":
-        setPassword(value);
-        break;
-      case "confirmPassword":
-        setConfirmPassword(value);
-        break;
-      default:
-        break;
-    }
+ 
   };
 
   const handleSubmit = async (e) => {
@@ -1222,3 +1219,113 @@ export default function SignUp() {
   );
 }
 ````
+
+### SingUp fonction frontend
+
+
+1. handleChange : mise à jour les données du formulaire
+
+````
+// Les états
+ const [formData, setFormData] = useState({});
+ //eyes icon
+  const [visiblePassword, setVisiblePassword] = useState(false);
+  const [visibleConfirmPassword, setVisibleConfirmPassword] = useState(false);
+// gestion erreurs et chargement
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+````
+
+**const handleChange**:  gère les changements des champs d’entrée/saisie. 
+
+Lorsqu’une valeur est saisie dans un champ, il le met à jour l’état formData avec la nouvelle valeur :
+- **e.target.id** = clé,  
+- **e.target.value** = nouvelle valeur pour cette clé.
+
+> Dans la console :
+
+````
+ {
+    username: 'test',
+    email: 'testemail',
+    password: 'psw',
+    confirmPassword: 'pswconfirm'
+  }
+````
+
+2. handleChange : 
+
+````
+ const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("submit");
+  };
+````
+> Dans la console : 'submit'
+
+3. Proxy vite:
+
+````
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        secure: false,
+      },
+    },
+  },
+  plugins: [react()],
+});
+````
+
+En local on est en http et https donc secure: false,
+
+4. handleSubmit :
+
+````
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
+      console.log(data);
+}
+````
+
+5. test + vérification :
+
+dans la console.log : 
+{message: 'Inscription réussie'}
+
+dans mongoDB vérifier que le nouveau user est créé.
+_id
+ObjectId('gugourgguorhoiughiorhgihrihgioh')
+username
+"user1"
+email
+"user1@gmail.com"
+password
+"$2a$10$wkrKCj2g9YL.kQprPRiSJOmFm117NFJ7nEaXWZGZg.U8gRQSHsNuK"
+profilePicture
+"https://img.freepik.com/premium-vector/man-avatar-profile-picture-vect…"
+createdAt
+2024-06-24T08:42:54.952+00:00
+updatedAt
+2024-06-24T08:42:54.952+00:00
+
+

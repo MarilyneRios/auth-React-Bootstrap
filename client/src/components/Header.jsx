@@ -7,38 +7,60 @@ import { Link } from "react-router-dom";
 
 function Header() {
   return (
-    <Navbar expand="lg" bg="light" variant="light" data-bs-theme="light" className="border-bottom border-success">
+    <Navbar
+      expand="lg"
+      bg="light"
+      variant="light"
+      data-bs-theme="light"
+      className="border-bottom border-success"
+    >
       <Container fluid>
-      {/** Titre */}
-        <Navbar.Brand as={Link} to="/" className="text-success fs-4">Auth React-Bootstrap</Navbar.Brand>
+        {/** Titre */}
+        <Navbar.Brand as={Link} to="/" className="text-success fs-4">
+          Auth React-Bootstrap
+        </Navbar.Brand>
+
+        {/** Btns on small screens */}
+        <div className="d-lg-none d-flex align-items-center">
+          <Nav.Link as={Link} to="/sign-in" className="p-0">
+            <Button variant="success" className="mx-1">
+              <FaSignInAlt /> Connexion
+            </Button>
+          </Nav.Link>
+          <Nav.Link as={Link} to="/sign-up" className="p-0">
+            <Button variant="outline-success" className="mx-1">
+              <FaSignOutAlt /> Inscription
+            </Button>
+          </Nav.Link>
+        </div>
+
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        {/** Liens */}
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto mb-2 mb-lg-0">
-            <Nav.Link as={Link}  to="/" className="my-auto">
-              Home
-            </Nav.Link>
-            <Nav.Link as={Link}  to="/about" className="my-auto">
-              A propos
-            </Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-        <Navbar.Collapse id="basic-navbar-nav">
-        {/** Btns */}
-          <Nav className="ms-auto mb-2 mb-lg-0">
-          <Nav.Link as={Link}  to="/sign-in">
-              <Button variant="outline-success" className="mx-1">
+
+        {/** Liens and buttons on large screens */}
+        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between w-100">
+          <div className="d-flex justify-content-center flex-grow-1">
+            <Nav className="mx-auto mb-2 mb-lg-0">
+              <Nav.Link as={Link} to="/" className="my-auto">
+                Home
+              </Nav.Link>
+              <Nav.Link as={Link} to="/about" className="my-auto">
+                A propos
+              </Nav.Link>
+            </Nav>
+          </div>
+
+          <div className="d-none d-lg-flex align-items-center">
+            <Nav.Link as={Link} to="/sign-in" className="p-0">
+              <Button variant="success" className="mx-1">
                 <FaSignInAlt /> Connexion
               </Button>
             </Nav.Link>
-
-            <Nav.Link as={Link}  to="/sign-up">
+            <Nav.Link as={Link} to="/sign-up" className="p-0">
               <Button variant="outline-success" className="mx-1">
-                <FaSignOutAlt />
-                Inscription
+                <FaSignOutAlt /> Inscription
               </Button>
             </Nav.Link>
-          </Nav>
+          </div>
         </Navbar.Collapse>
       </Container>
     </Navbar>
@@ -46,12 +68,3 @@ function Header() {
 }
 
 export default Header;
-
-// Pour afficher le nom du user qaund connecté
-/**
- <Navbar.Collapse className="justify-content-end">
-    <Navbar.Text>
-      Signed in as: <a href="#login">Mark Otto</a>
-    </Navbar.Text>
- </Navbar.Collapse>
- */

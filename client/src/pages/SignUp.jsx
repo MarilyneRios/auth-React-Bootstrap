@@ -6,75 +6,65 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+ //eyes icon
   const [visiblePassword, setVisiblePassword] = useState(false);
   const [visibleConfirmPassword, setVisibleConfirmPassword] = useState(false);
+// gestion erreurs et chargement
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
-
-    switch (id) {
-      case "username":
-        setUsername(value);
-        break;
-      case "email":
-        setEmail(value);
-        break;
-      case "password":
-        setPassword(value);
-        break;
-      case "confirmPassword":
-        setConfirmPassword(value);
-        break;
-      default:
-        break;
-    }
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
+  //console.log(formData)
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("submit");
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
+    console.log(data);
   };
 
   return (
     <FormContainer>
       <h1 className="d-flex justify-content-center text-success">Inscription</h1>
       <Form onSubmit={handleSubmit}>
-        <Form.Group className="my-2" controlId="username">
+        <Form.Group className="my-2" >
           <Form.Control
             type="text"
             id="username"
             placeholder="Pseudo"
-            value={username}
             onChange={handleChange}
+            autoComplete="username"
           ></Form.Control>
         </Form.Group>
 
-        <Form.Group className="my-2" controlId="email">
+        <Form.Group className="my-2" >
           <Form.Control
             type="email"
             id="email"
             placeholder="Email"
-            value={email}
             onChange={handleChange}
+            autoComplete="email"
           ></Form.Control>
         </Form.Group>
 
-        <Form.Group className="my-2" controlId="password">
+        <Form.Group className="my-2" >
           <div className="d-flex">
             <Form.Control
               type={visiblePassword ? "text" : "password"}
               id="password"
               placeholder="Mot de passe"
-              value={password}
               onChange={handleChange}
-              autoComplete="password"
+              autoComplete="current-password"
               className="me-2"
             ></Form.Control>
             {visiblePassword ? (
@@ -93,15 +83,14 @@ export default function SignUp() {
           </div>
         </Form.Group>
 
-        <Form.Group className="my-2" controlId="confirmPassword">
+        <Form.Group className="my-2" >
           <div className="d-flex">
             <Form.Control
               type={visibleConfirmPassword ? "text" : "password"}
               id="confirmPassword"
               placeholder="Confirmation du mot de passe"
-              value={confirmPassword}
               onChange={handleChange}
-              autoComplete="confirmPassword"
+              autoComplete="new-password"
               className="me-2"
             ></Form.Control>
             {visibleConfirmPassword ? (

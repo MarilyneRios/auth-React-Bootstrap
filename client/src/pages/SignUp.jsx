@@ -6,10 +6,10 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
- //eyes icon
+  //eyes icon
   const [visiblePassword, setVisiblePassword] = useState(false);
   const [visibleConfirmPassword, setVisibleConfirmPassword] = useState(false);
-// gestion erreurs et chargement
+  // gestion erreurs et chargement
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -19,25 +19,38 @@ export default function SignUp() {
 
   //console.log(formData)
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-    const data = await res.json();
-    console.log(data);
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      //console.log(data);
+      setLoading(false);
+      if (data.success === false) {
+        setError(true);
+        return;
+      }
+    } catch (error) {
+      setLoading(false);
+      setError(true);
+    }
   };
 
   return (
     <FormContainer>
-      <h1 className="d-flex justify-content-center text-success">Inscription</h1>
+      <h1 className="d-flex justify-content-center text-success">
+        Inscription
+      </h1>
       <Form onSubmit={handleSubmit}>
-        <Form.Group className="my-2" >
+        <Form.Group className="my-2">
           <Form.Control
             type="text"
             id="username"
@@ -47,7 +60,7 @@ export default function SignUp() {
           ></Form.Control>
         </Form.Group>
 
-        <Form.Group className="my-2" >
+        <Form.Group className="my-2">
           <Form.Control
             type="email"
             id="email"
@@ -57,7 +70,7 @@ export default function SignUp() {
           ></Form.Control>
         </Form.Group>
 
-        <Form.Group className="my-2" >
+        <Form.Group className="my-2">
           <div className="d-flex">
             <Form.Control
               type={visiblePassword ? "text" : "password"}
@@ -83,7 +96,7 @@ export default function SignUp() {
           </div>
         </Form.Group>
 
-        <Form.Group className="my-2" >
+        <Form.Group className="my-2">
           <div className="d-flex">
             <Form.Control
               type={visibleConfirmPassword ? "text" : "password"}
@@ -109,8 +122,9 @@ export default function SignUp() {
           </div>
         </Form.Group>
 
-        <Button type="submit" variant="outline-success" className="my-3 w-100">
+        <Button type="submit" variant="outline-success" className="my-3 w-100"  disabled={loading}>
           S&rsquo;inscrire
+          {loading ? "Loading..." : " S'enregistrer"}
         </Button>
       </Form>
 
@@ -120,6 +134,12 @@ export default function SignUp() {
           <Link to="/sign-in" className="text-success">
             Se connecter
           </Link>
+          <p className="text-danger mt-5">
+            {error &&
+              (typeof error === "string"
+                ? error
+                : "Le Pseudo ou l'email est déjà utilisé!")}
+          </p>
         </Col>
       </Row>
     </FormContainer>

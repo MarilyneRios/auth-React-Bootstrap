@@ -12,15 +12,27 @@ export default function SignUp() {
   // gestion erreurs et chargement
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  // gestion de la confirmation du psw
+  const [passwordConfirm, setPasswordConfirm] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    if (id === "passwordConfirm") {
+      setPasswordConfirm(value);
+    } else {
+      setFormData({ ...formData, [id]: value });
+    }
   };
 
   //console.log(formData)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password !== passwordConfirm) {
+      setError("Les mots de passe ne correspondent pas !");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(false);
@@ -100,10 +112,11 @@ export default function SignUp() {
           <div className="d-flex">
             <Form.Control
               type={visibleConfirmPassword ? "text" : "password"}
-              id="confirmPassword"
+              id="passwordConfirm"
               placeholder="Confirmation du mot de passe"
               onChange={handleChange}
               autoComplete="new-password"
+              value={passwordConfirm}
               className="me-2"
             ></Form.Control>
             {visibleConfirmPassword ? (
@@ -123,7 +136,7 @@ export default function SignUp() {
         </Form.Group>
 
         <Button type="submit" variant="outline-success" className="my-3 w-100"  disabled={loading}>
-          S&rsquo;inscrire
+         
           {loading ? "Loading..." : " S'enregistrer"}
         </Button>
       </Form>

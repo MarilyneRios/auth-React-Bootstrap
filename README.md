@@ -1498,5 +1498,7 @@ Le Token avec une clé secrète qui est stockée dans une variable d’environne
 
 5. test avec thunder, insomnia ou postman
 
+> POST http://localhost:3000/api/auth/signin
 - avec les infos correctes
 - avec des infos erronées
+

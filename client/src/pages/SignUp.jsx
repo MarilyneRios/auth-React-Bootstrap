@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate  } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -23,7 +23,7 @@ export default function SignUp() {
       setFormData({ ...formData, [id]: value });
     }
   };
-
+  const navigate = useNavigate();
   //console.log(formData)
 
   const handleSubmit = async (e) => {
@@ -50,6 +50,7 @@ export default function SignUp() {
         setError(true);
         return;
       }
+      navigate("/sign-in");
     } catch (error) {
       setLoading(false);
       setError(true);

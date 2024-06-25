@@ -1421,3 +1421,82 @@ updatedAt
  value={passwordConfirm}
 
 ```` 
+
+5. vérifier dans mongoDB et console
+
+//---------------------------------
+
+# SignIn Api route Back
+
+1. authRoute.js
+
+````
+router.post('/signin', signin);
+````
+
+2. authControllers.js
+
+````
+import { errorHandler } from '../utils/error.js';
+````
+
+````
+export const signin = async (req, res, next) => {
+   
+    const { email, password } = req.body;
+  
+    try{
+        //vérif si email est correct
+        const validUser = await User.findOne({ email });
+        if (!validUser) return next(errorHandler(404, 'User not found'));
+        //vérif le psw ne pas dire que le psw est incorrect sinon on facilite le travail des hackers
+        //compareSync comparer les passwords (mongoDB et saisie)
+        const validPassword = bcryptjs.compareSync(password, validUser.password);
+        if (!validPassword) return next(errorHandler(401, 'wrong credentials'));
+        } catch (error) {
+        next(error)
+    }
+};
+````
+
+3. Créer le token et le mettre dans un cookie:
+
+Afin d'éviter d'utiliser le ID de la database.
+
+https://www.npmjs.com/package/jsonwebtoken
+
+````
+import jwt from 'jsonwebtoken';
+````
+
+````
+//token
+ const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+const expiryDate = new Date(Date.now() + 28800000); // 8 heures
+res
+  .cookie('access_token', token, { httpOnly: true, expires: expiryDate })  
+  .status(200)
+  .json(rest);
+````
+**res.cookie('access_token', token, { httpOnly: true,})** : 
+
+- Crée un nouveau cookie nommé **access_token** et y stocke le token JWT. 
+
+- **httpOnly: true** signifie que le cookie ne peut **pas** être **accédé** ou modifié par des scripts **côté client** 
+
+**const expiryDate = new Date(Date.now() + 28800000);** : 
+- Crée une  date d'expiration qui est 8 heures plus tard que l’heure actuelle.
+
+**const { password: hashedPassword, ...rest } = validUser._doc;** :
+
+> **...rest** est utilisé pour envoyer toutes les infos du user au client, **sauf le mot de passe**. C'est une déstrucutation pour séparer le psw car ce n'est pas sécure de le garder.
+
+4. .env :
+
+Le Token avec une clé secrète qui est stockée dans une variable d’environnement :
+**JWT_SECRET** => pour plus de sécurité
+
+5. test avec thunder, insomnia ou postman
+
+- avec les infos correctes
+- avec des infos erronées

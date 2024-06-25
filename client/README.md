@@ -764,3 +764,96 @@ updatedAt
 2024-06-24T08:42:54.952+00:00
 
 ````
+## Gestion des erreurs et chargements
+
+````
+ const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      //console.log(data);
+      setLoading(false);
+      if (data.success === false) {
+        setError(true);
+        return;
+      }
+    } catch (error) {
+      setLoading(false);
+      setError(true);
+    }
+  };
+
+//--------------
+
+  <Button type="submit" variant="outline-success" className="my-3 w-100"  disabled={loading}>
+    {loading ? "Loading..." : " S'enregistrer"}
+  </Button>
+
+
+//---------
+<Row className="py-3">
+ <Col className="text-center">
+    Avez-vous déjà un compte ?{" "}
+    <Link to="/sign-in" className="text-success">
+            Se connecter
+    </Link>
+    <p className="text-danger mt-5">
+      {error &&
+      (typeof error === "string"
+      ? error
+      : "Le Pseudo ou l'email est déjà utilisé!")}
+    </p>
+  </Col>
+ </Row>
+
+````
+
+## gestion de la confirmation du password avec erreur
+
+1. état
+````
+  // gestion de la confirmation du psw
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+````
+
+2. saisie
+````
+ const handleChange = (e) => {
+    const { id, value } = e.target;
+    if (id === "passwordConfirm") {
+      setPasswordConfirm(value);
+    } else {
+      setFormData({ ...formData, [id]: value });
+    }
+  };
+````
+
+3. fonction vérif si identique
+````
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.password !== passwordConfirm) {
+      setError("Les mots de passe ne correspondent pas !");
+      return;
+    }
+    //......
+  }    
+````
+
+4. valeur confirmPassword
+
+````
+ value={passwordConfirm}
+
+```` 
+
+5. vérifier dans mongoDB et console

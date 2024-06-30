@@ -1502,3 +1502,449 @@ Le Token avec une clé secrète qui est stockée dans une variable d’environne
 - avec les infos correctes
 - avec des infos erronées
 
+//------------------------
+# SignIn frontend
+
+## SignIn UI
+
+````
+ <FormContainer>
+      <h1 className="d-flex justify-content-center text-success">Connexion</h1>
+
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="my-2" >
+          <Form.Control
+           type="email"
+            id="email"
+            placeholder="Email"
+            onChange={handleChange}
+            autoComplete="email"
+          ></Form.Control>
+        </Form.Group>
+
+        <Form.Group className="my-2">
+          <div className="d-flex">
+            <Form.Control
+              type={visiblePassword ? "text" : "password"}
+              id="password"
+              placeholder="Mot de passe"
+              onChange={handleChange}
+              autoComplete="current-password"
+              className="me-2"
+            ></Form.Control>
+            {visiblePassword ? (
+              <FaEyeSlash
+                onClick={() => setVisiblePassword(false)}
+                className="m-3"
+                size={20}
+              />
+            ) : (
+              <FaEye
+                onClick={() => setVisiblePassword(true)}
+                size={20}
+                className="m-3"
+              />
+            )}
+          </div>
+        </Form.Group>
+
+        <Button type="submit" variant="outline-success" className="my-3 w-100" disabled={loading}>
+          
+          {loading ? "Loading..." : "Se connecter"}
+        </Button>
+
+        <Button
+          variant="outline-dark"
+          className="w-100 d-flex align-items-center justify-content-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <img
+            src="https://img.icons8.com/?size=100&id=17949&format=png&color=000000"
+            alt="Google"
+            height="25"
+            width="25"
+          />
+          Continue avec Google
+        </Button>
+      </Form>
+
+      <Row className="py-3 ">
+        <Col>
+          Avez-vous un compte ?{" "}
+          <Link to="/sign-up" className="text-success">
+            Inscription
+          </Link>
+          <p className="text-danger mt-5">
+            {error &&
+              (typeof error === "string"
+                ? error
+                : "Le Pseudo ou l'email est déjà utilisé!")}
+          </p>
+        </Col>
+      </Row>
+    </FormContainer>
+````
+
+## SignIn fct
+
+````
+const [formData, setFormData] = useState("");
+  const [visiblePassword, setVisiblePassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.email || !formData.password) {
+      setError("Veuillez remplir tous les champs.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      console.log("Sending request to /api/auth/signin with data:", formData);
+
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      console.log("Response status:", res.status);
+
+      const data = await res.json();
+      setLoading(false);
+
+      console.log("Response data:", data);
+
+      if (data.success === false) {
+        setError("Le pseudo ou l'email est incorrect !");
+        return;
+      }
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error during fetch:", error);
+      setLoading(false);
+      setError(true);
+    }
+  };
+````
+
+Puis test avec navigateur, voir dans l'inspecteur> réseau.
+
+## SignUp 
+
+ajout de :
+
+- **import { Link, useNavigate  } from "react-router-dom";**
+- **const navigate = useNavigate();** 
+- **navigate("/sign-in");** 
+
+# Redux
+
+https://redux-toolkit.js.org/
+
+
+1. npm install @reduxjs/toolkit dans client
+
+2. npm install react-redux dans client
+
+3. Créer le dossier redux dans src
+
+4. Créer le fichier store.js dans redux
+
+````
+import { configureStore } from "@reduxjs/toolkit";
+
+export const store = configureStore({
+  reducer: {},
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
+});
+````
+- **configureStore** : une fonction de @reduxjs/toolkit qui simplifie la configuration d'un store Redux.
+
+- **reducer: {}** : aucun reducer n'a été fourni pour l'instant.
+
+- **getDefaultMiddleware**: middlewares par défaut utilisés par @reduxjs/toolkit.
+
+- **serializableCheck: false**: un middleware de vérification de la sérialisation désactivé.
+
+5. main.js
+
+````
+//redux
+import { store} from './redux/store.js';
+import { Provider } from 'react-redux';
+
+//---------
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+    <Provider store={store}>
+      <React.StrictMode>
+        <RouterProvider router={router} />
+      </React.StrictMode>
+    </Provider>
+);
+
+
+````
+
+6. userSlice.js
+
+````
+import { createSlice } from '@reduxjs/toolkit';
+
+
+const initialState = {
+    currentUser: null,
+    loading: false,
+    error: false,
+  };
+  
+  const userSlice = createSlice({
+    name: 'user',
+    initialState,
+    reducers: {
+      signInStart: (state) => {
+        state.loading = true;
+      },
+      signInSuccess: (state, action) => {
+        state.currentUser = action.payload;
+        state.loading = false;
+        state.error = false;
+      },
+      signInFailure: (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      },
+    },
+  });
+  
+  export const {
+    signInStart,
+    signInSuccess,
+    signInFailure,
+  } = userSlice.actions;
+  
+  export default userSlice.reducer;
+
+````
+
+- **createSlice** :  permet de créer un slice.
+
+ps:  Un **slice** dans **Redux Toolkit** permet la gestion de l’état dans une application.
+
+- Réducteurs (reducers) : Ce sont des fonctions qui définissent comment l’état de l’application change en réponse à des actions.
+> exemple: signInSuccess :
+
+    Cette action est déclenchée lorsque la connexion réussit, met à jour currentUser avec les informations du user fournies dans action.payload, et définit loading à false et error à false.
+
+- État initial (initial state) : C’est l’état de départ.
+
+- Actions : Ce sont des objets qui décrivent ce qui se passe dans l’application.
+
+En bref : 
+- Déclencher le début d'une tentative de connexion (signInStart).
+
+- Mettre à jour l'état lorsque la connexion réussit (signInSuccess).
+
+- Gérer les erreurs en cas d'échec de la connexion (signInFailure).
+
+7. store.js
+
+````
+import { configureStore } from "@reduxjs/toolkit";
+import { userReducer } from "./userSlice.js";
+
+export const store = configureStore({
+  reducer: {user: userReducer},
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
+});
+
+````
+ps: nous pouvons **changer  le nom** en userReducer parce que dans userSlice.js on a utilisé :  **export default** userSlice.reducer;
+
+8. SignIn.jsx
+
+on peut utiliser le reducer :
+
+````
+import {  signInStart,signInSuccess, signInFailure,} from '../redux/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+//------------------------------
+
+const { loading, error } = useSelector((state) => state.user);
+
+//------------------------------
+
+const dispatch = useDispatch();
+
+//------------------------------
+ const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.email || !formData.password) {
+      setError("Veuillez remplir tous les champs.");
+      return;
+    }
+
+    try {
+      dispatch(signInStart());
+
+      console.log("Sending request to /api/auth/signin with data:", formData);
+
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      //setLoading(false);
+
+      if (data.success === false) {
+        dispatch(signInFailure(data));
+      return;
+      }
+      dispatch(signInSuccess(data));
+      navigate("/");
+    } catch (error) {
+      dispatch(signInFailure(error));
+    }
+  };
+````
+
+## Redux persist
+
+https://redux-toolkit.js.org/rtk-query/usage/persistence-and-rehydration
+
+Redux Persist est une bibliothèque qui  permet de sauvegarder l'état de Redux dans un moteur de stockage, tel que localStorage ou sessionStorage afin d'éviter de perdre la session après un raffraichissement.
+
+1. npm install redux-persist
+
+2. store.js
+
+> Combiner tous les réduceurs => const rootReducer 
+
+````
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+//......
+const rootReducer = combineReducers({ user: userReducer });
+
+````
+> Définir  un objet de configuration : persisConfig  pour Redux Persist.
+Le rôle de cette clé 'root' est d'utiliser 'root' comme préfixe pour les entrées de stockage.
+
+````
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage,
+};
+````
+
+> Créer un réduceur persistant à partir de redux avec 2 arguments : la configuration de persistance (persistConfig) et le réduceur racine (rootReducer)
+
+````
+import { persistReducer, persistStore } from 'redux-persist';
+//.....
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+````
+
+> Configuration du store
+
+- un store Redux 
+
+-  un réducteur racine persistant 
+
+- Personnalise les middlewares pour désactiver la vérification de la sérialisation
+
+````
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
+````
+
+> Initialise le persistor
+
+````
+export const persistor = persistStore(store);
+````
+
+3. main.jsx
+
+````
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
+//Redux
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './redux/store';
+//style
+import './index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+// importation composants
+import App from './App';
+import PrivateRoute from './components/PrivateRoute';
+import Home from './pages/Home';
+import About from './pages/About';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import Profile from './pages/Profile';
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path='/' element={<App />}>
+      <Route index={true} path='/' element={<Home />} />
+      <Route path='/sign-in' element={<SignIn />} />
+      <Route path='/about' element={<About />} />
+      <Route path='/sign-up' element={<SignUp />} />
+      <Route path='' element={<PrivateRoute />}>
+        <Route path='/profile' element={<Profile />} />
+      </Route>
+    </Route>
+  )
+);
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <Provider store={store}>
+    <PersistGate persistor={persistor} loading={null}>
+      <React.StrictMode>
+        <RouterProvider router={router} />
+      </React.StrictMode>
+    </PersistGate>
+  </Provider>
+);
+````
+
+4. PrivateRoutes.jsx
+
+````
+import { useSelector } from 'react-redux';
+import { Outlet, Navigate } from 'react-router-dom';
+
+export default function PrivateRoute() {
+  const { currentUser } = useSelector(state => state.user);
+
+  return currentUser ? <Outlet /> : <Navigate to='/sign-in' />;
+}
+
+````

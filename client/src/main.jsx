@@ -1,16 +1,16 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
-//import { Provider } from 'react-redux';
-//import { PersistGate } from 'redux-persist/integration/react';
-//import { store, persistor } from './store';
-
-//styles
-import './index.css'
+//Redux
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './redux/store';
+//style
+import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-//pages
-import App from './App.jsx';
-import PrivateRoute from './components/PrivateRoute.jsx';
+// importation composants
+import App from './App';
+import PrivateRoute from './components/PrivateRoute';
 import Home from './pages/Home';
 import About from './pages/About';
 import SignIn from './pages/SignIn';
@@ -32,12 +32,15 @@ const router = createBrowserRouter(
 );
 
 ReactDOM.createRoot(document.getElementById('root')).render(
- 
+  <Provider store={store}>
+    <PersistGate persistor={persistor} loading={null}>
       <React.StrictMode>
         <RouterProvider router={router} />
       </React.StrictMode>
-   
+    </PersistGate>
+  </Provider>
 );
+
  /*
 import React from 'react'
 import ReactDOM from 'react-dom/client'

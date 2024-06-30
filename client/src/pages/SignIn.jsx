@@ -3,14 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { signInStart, signInSuccess, signInFailure } from "../redux/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function SignIn() {
-  const [formData, setFormData] = useState("");
+  const [formData, setFormData] = useState({});
   const [visiblePassword, setVisiblePassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -24,11 +25,7 @@ export default function SignIn() {
     }
 
     try {
-      setLoading(true);
-      setError("");
-
-      console.log("Sending request to /api/auth/signin with data:", formData);
-
+      dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
@@ -37,23 +34,17 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
 
-      console.log("Response status:", res.status);
-
       const data = await res.json();
-      setLoading(false);
-
-      console.log("Response data:", data);
 
       if (data.success === false) {
-        setError("Le pseudo ou l'email est incorrect !");
+        dispatch(signInFailure(data.message)); // Dispatch failure with error message
         return;
       }
 
-      navigate("/");
+      dispatch(signInSuccess(data)); // Dispatch success with data
+      navigate("/"); // Navigate to homepage on successful sign-in
     } catch (error) {
-      console.error("Error during fetch:", error);
-      setLoading(false);
-      setError(true);
+      dispatch(signInFailure(error.message)); // Dispatch failure with error object
     }
   };
 
@@ -67,10 +58,10 @@ export default function SignIn() {
             type="email"
             id="email"
             placeholder="Email"
-            value={formData.email}
+            value={formData.email || ""}
             onChange={handleChange}
             autoComplete="email"
-          ></Form.Control>
+          />
         </Form.Group>
 
         <Form.Group className="my-2">
@@ -79,11 +70,11 @@ export default function SignIn() {
               type={visiblePassword ? "text" : "password"}
               id="password"
               placeholder="Mot de passe"
-              value={formData.password}
+              value={formData.password || ""}
               onChange={handleChange}
               autoComplete="current-password"
               className="me-2"
-            ></Form.Control>
+            />
             {visiblePassword ? (
               <FaEyeSlash
                 onClick={() => setVisiblePassword(false)}
@@ -135,7 +126,7 @@ export default function SignIn() {
           </Link>
           {error && (
             <p className="text-danger mt-5">
-              {error}
+              {typeof error === "string" ? error : error.message}
             </p>
           )}
         </Col>

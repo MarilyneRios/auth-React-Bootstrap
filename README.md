@@ -1784,7 +1784,7 @@ on peut utiliser le reducer :
 import {  signInStart,signInSuccess, signInFailure,} from '../redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 //------------------------------
-
+const [formData, setFormData] = useState({});
 const { loading, error } = useSelector((state) => state.user);
 
 //------------------------------
@@ -1888,6 +1888,39 @@ export const store = configureStore({
 export const persistor = persistStore(store);
 ````
 
+En bref,
+
+````
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { persistReducer, persistStore } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+// importation les reducers
+import userReducer from "./userSlice.js"; 
+
+const rootReducer = combineReducers({
+  user: userReducer,
+  // Ajoutez les autres reducers ici
+});
+
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage,
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
+
+export const persistor = persistStore(store);
+````
+
 3. main.jsx
 
 ````
@@ -1935,6 +1968,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 );
 ````
 
+
 4. PrivateRoutes.jsx
 
 ````
@@ -1944,7 +1978,8 @@ import { Outlet, Navigate } from 'react-router-dom';
 export default function PrivateRoute() {
   const { currentUser } = useSelector(state => state.user);
 
-  return currentUser ? <Outlet /> : <Navigate to='/sign-in' />;
+  return currentUser ? <Outlet /> : <Navigate to='/sign-in' replace/>;
 }
+
 
 ````

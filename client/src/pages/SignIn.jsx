@@ -5,6 +5,7 @@ import FormContainer from "../components/FormContainer";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { signInStart, signInSuccess, signInFailure } from "../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../components/OAuth";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -53,7 +54,7 @@ export default function SignIn() {
       <h1 className="d-flex justify-content-center text-success">Connexion</h1>
 
       <Form onSubmit={handleSubmit}>
-        <Form.Group className="my-2">
+        <Form.Group className="my-2 ">
           <Form.Control
             type="email"
             id="email"
@@ -100,22 +101,9 @@ export default function SignIn() {
           {loading ? "Chargement..." : "Se connecter"}
         </Button>
 
-        <Button
-          variant="outline-dark"
-          className="w-100 d-flex align-items-center justify-content-center gap-2"
-          disabled={loading}
-          onClick={() => {
-            // Gérez la connexion avec Google ici si OAuth est configuré
-          }}
-        >
-          <img
-            src="https://img.icons8.com/?size=100&id=17949&format=png&color=000000"
-            alt="Google"
-            height="25"
-            width="25"
-          />
-          Continue avec Google
-        </Button>
+            <OAuth/>
+
+    
       </Form>
 
       <Row className="py-3">

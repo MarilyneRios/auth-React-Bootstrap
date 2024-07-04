@@ -40,10 +40,10 @@ function Header() {
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between w-100">
           <div className="d-flex justify-content-center flex-grow-1">
             <Nav className="mx-auto mb-2 mb-lg-0">
-              <Nav.Link as={Link} to="/" className="my-auto">
+              <Nav.Link as={Link} to="/" className="my-auto text-success">
                 Home
               </Nav.Link>
-              <Nav.Link as={Link} to="/about" className="my-auto">
+              <Nav.Link as={Link} to="/about" className="my-auto text-success">
                 A propos
               </Nav.Link>
             </Nav>
@@ -51,12 +51,12 @@ function Header() {
 
           <div className="d-none d-lg-flex align-items-center">
             <Nav.Link as={Link} to="/sign-in" className="p-0">
-              <Button variant="success" className="mx-1">
+              <Button variant="outline-success" className="mx-1">
                 <FaSignInAlt /> Connexion
               </Button>
             </Nav.Link>
             <Nav.Link as={Link} to="/sign-up" className="p-0">
-              <Button variant="outline-success" className="mx-1">
+              <Button variant="success" className="mx-1">
                 <FaSignOutAlt /> Inscription
               </Button>
             </Nav.Link>

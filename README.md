@@ -2020,4 +2020,84 @@ export default function OAuth() {
 }
 ````
 
-2. 
+2.  firebase google :
+
+https://console.firebase.google.com/
+
+- créer un projet
+- nom du projet : auth-React-Bootstrap
+- désactiver le google analytics pour ce projet (trainning projet)
+- continuer
+- clique "</>"
+- Pseudo de l'application : auth-React-Bootstrap
+- Enregistrer l'application
+
+- **installer firebase** coté client : 
+npm install firebase
+
+- fichier firebase.js dans libs
+
+````
+// Import the functions you need from the SDKs you need
+import { initializeApp, getApps } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECTID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGEBUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGERIESENDERID,
+    appId: import.meta.env.VITE_FIREBASE_APPID
+};
+
+// Initialize Firebase
+// Initialize Firebase
+let app;
+if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+} else {
+    app = getApps()[0];
+}
+export { app };
+````
+
+- créer un .env dans client et ajouter des infos sensible
+
+- sur firebase : Authentication
+- choisr google
+- cliquer sur activer
+- Méthode de connexion :
+> Nom public du projet : auth-React-Bootstrap
+> son email
+- sauvegarder
+- dans paramètres : lien Association de comptes utilisateur. Sur l'onglet domaine autorisé : localhost par défaut
+ps: Quand il faudra déployer l'application, il faudra ajouter l'URL
+
+3. Fonction asynchrone handleGoogleClick 
+
+````
+const handleGoogleClick = async () => {
+    try {
+        const provider = new GoogleAuthProvider();
+        const auth = getAuth(app);
+
+        const result = await signInWithPopup(auth, provider);
+        console.log(result)
+       
+    } catch (error) {
+        console.log('connexion avec google impossible', error);
+    }
+  };
+````
+
+et vérifier dans la console :
+**UserCredentialImpl** et trouver : *photoURL** copier le lien et le mettre dans le navigateur, votre photo devrait s'afficher
+
+4. userClient.js
+
+````
+
+````

@@ -1,3 +1,5 @@
+import { GoogleAuthProvider, signInWithPopup, getAuth } from 'firebase/auth';
+import { app } from '../firebase';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Button,  } from "react-bootstrap";
@@ -5,8 +7,18 @@ import { Button,  } from "react-bootstrap";
 export default function OAuth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleGoogleClick = async () => {
-  
+    try {
+        const provider = new GoogleAuthProvider();
+        const auth = getAuth(app);
+
+        const result = await signInWithPopup(auth, provider);
+        console.log(result)
+       
+    } catch (error) {
+        console.log('connexion avec google impossible', error);
+    }
   };
 
   return (

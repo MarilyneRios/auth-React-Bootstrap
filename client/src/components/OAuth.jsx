@@ -11,11 +11,14 @@ export default function OAuth() {
 
   const handleGoogleClick = async () => {
     try {
+        // Création d'une instance de fournisseur d'authentification Google
         const provider = new GoogleAuthProvider();
+        // Récupération de l'instance d'authentification Firebase
         const auth = getAuth(app);
 
+        // Affichage de la fenêtre pop-up pour l'authentification Google
         const result = await signInWithPopup(auth, provider);
-                
+       // Envoi des données utilisateur au serveur backend         
         const res = await fetch('/api/auth/google', {
           method: 'POST',
           headers: {
@@ -27,9 +30,12 @@ export default function OAuth() {
             photo: result.user.photoURL,
           }),
         });
+        // Réponse en JSON
         const data = await res.json();
-        console.log(data);
+       // console.log(data);
+        // Dispatch de l'action signInSuccess avec les données utilisateur
         dispatch(signInSuccess(data));
+        // Navigation vers la page home
         navigate('/');
        
     } catch (error) {

@@ -2134,7 +2134,7 @@ et vérifier dans la console >  les metas données :
 
 ````
 
-5. routes > userRoute.js dans api
+## routes > userRoute.js dans api
 
 ````
 import { signin, signup, google, signout } from '../
@@ -2143,7 +2143,7 @@ import { signin, signup, google, signout } from '../
 router.post('/google', google);
 ````
 
-6. authController.js > controller dans api
+## authController.js > controller dans api
 
 ````
 export const google = async (req, res, next) => {
@@ -2189,4 +2189,79 @@ export const google = async (req, res, next) => {
     next(error);
   }
 };
+````
+
+# Construire des routes privées
+
+## Header.jsx
+
+> Condition d'affichage basée sur currentUser:
+
+  - Si **currentUser**  est connecté alors le bloc <Link> contenant l'image de profil est affiché.
+
+  - Sinon, les boutons de connexion et d'inscription sont affichés.
+
+````
+import { Image } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import Logo from "../assets/logoDevGreen.png";
+/...
+  const { currentUser } = useSelector((state) => state.user);
+
+  const dispatch = useDispatch();
+/...
+  {/** Titre */}
+    <Image
+      src={Logo}
+       className="rounded-circle mx-3 img-fluid"
+      alt="Logo"
+      style={{
+         height: "3rem",
+         width: "3rem",
+         objectFit: "cover",
+      }}
+    />
+    <Navbar.Brand as={Link} to="/"   className="text-success fs-4">
+       Auth React-Bootstrap
+    </Navbar.Brand>
+//...
+      <div className="d-none d-lg-flex align-items-center">
+            {currentUser ? (
+              <>
+                <Link
+                  to="/profile"
+                  className="text-dark"
+                  style={{ textDecoration: "none" }}
+                >
+                  <Image
+                    src={currentUser.profilePicture}
+                    alt="profile"
+                    roundedCircle
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "defaultProfilePicture.png";
+                    }}
+                    style={{
+                      height: "3.5rem",
+                      width: "3.5rem",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Link>
+              </>
+            ) : (
+              <>
+                <Nav.Link as={Link} to="/sign-in" className="p-0">
+                  <Button variant="outline-success" className="mx-1">
+                    <FaSignInAlt /> Connexion
+                  </Button>
+                </Nav.Link>
+                <Nav.Link as={Link} to="/sign-up" className="p-0">
+                  <Button variant="success" className="mx-1">
+                    <FaSignOutAlt /> Inscription
+                  </Button>
+                </Nav.Link>
+              </>
+            )}
+          </div>
 ````

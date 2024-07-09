@@ -26,7 +26,7 @@ export default function Hero() {
                     </Button>
                 </Link>
                 <Link to='/sign-up'>
-                    <Button variant='outline-success'>
+                    <Button variant='success'>
                     <FaSignOutAlt /> Inscription
                     </Button>
                 </Link>

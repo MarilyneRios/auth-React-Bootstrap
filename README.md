@@ -2077,6 +2077,11 @@ export { app };
 ps: Quand il faudra déployer l'application, il faudra ajouter l'URL
 
 3. Fonction asynchrone handleGoogleClick 
+https://firebase.google.com/docs/auth/web/google-signin?hl=fr
+
+Pour vous connecter avec une fenêtre pop-up, appelez signInWithPopup :
+
+L’instance d’authentification Firebase est obtenue en utilisant la fonction getAuth.
 
 ````
 const handleGoogleClick = async () => {
@@ -2093,11 +2098,95 @@ const handleGoogleClick = async () => {
   };
 ````
 
-et vérifier dans la console :
-**UserCredentialImpl** et trouver : *photoURL** copier le lien et le mettre dans le navigateur, votre photo devrait s'afficher
+et vérifier dans la console >  les metas données :
+**UserCredentialImpl** et trouver : **photoURL** copier le lien et le mettre dans le navigateur, votre photo devrait s'afficher
 
-4. userClient.js
+4. Const res avec fetch
+
+````
+  const handleGoogleClick = async () => {
+    try {
+        const provider = new GoogleAuthProvider();
+        const auth = getAuth(app);
+
+        const result = await signInWithPopup(auth, provider);
+                
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: result.user.displayName,
+            email: result.user.email,
+            photo: result.user.photoURL,
+          }),
+        });
+        const data = await res.json();
+        console.log(data);
+        dispatch(signInSuccess(data));
+        navigate('/');
+       
+    } catch (error) {
+        console.log('connexion avec google impossible', error);
+    }
+  };
 
 ````
 
+5. routes > userRoute.js dans api
+
+````
+import { signin, signup, google, signout } from '../
+
+//........
+router.post('/google', google);
+````
+
+6. authController.js > controller dans api
+
+````
+export const google = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const { password: hashedPassword, ...rest } = user._doc;
+      const expiryDate = new Date(Date.now() + 28800000); // 8 heures
+      res
+        .cookie('access_token', token, {
+          httpOnly: true,
+          expires: expiryDate,
+        })
+        .status(200)
+        .json(rest);
+    } else {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      const newUser = new User({
+        username:
+          req.body.name.split(' ').join('').toLowerCase() +
+          Math.random().toString(36).slice(-8),
+        email: req.body.email,
+        password: hashedPassword,
+        profilePicture: req.body.photo,
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password: hashedPassword2, ...rest } = newUser._doc;
+      const expiryDate = new Date(Date.now() + 28800000); // 8 heures
+      res
+        .cookie('access_token', token, {
+          httpOnly: true,
+          expires: expiryDate,
+        })
+        .status(200)
+        .json(rest);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 ````

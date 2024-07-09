@@ -2265,3 +2265,57 @@ import Logo from "../assets/logoDevGreen.png";
             )}
           </div>
 ````
+
+## Rappels :
+
+1. PrivateRopute.jsx :
+
+Le but de PrivateRoute est de protéger certaines routes de l'application, **permettant uniquement aux utilisateurs connectés d'y accéder**.
+
+````
+import { useSelector } from 'react-redux';
+import { Outlet, Navigate } from 'react-router-dom';
+
+export default function PrivateRoute() {
+  // accès à l'état redux
+  const { currentUser } = useSelector(state => state.user);
+  // rendu conditionnel
+  //Si currentUser connecté alors <Outlet /> rendu
+  return currentUser ? <Outlet /> : <Navigate to='/sign-in' replace/>;
+}
+````
+2. main.jsx :
+
+````
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path='/' element={<App />}>
+      <Route index={true} path='/' element={<Home />} />
+      <Route path='/sign-in' element={<SignIn />} />
+      <Route path='/about' element={<About />} />
+      <Route path='/sign-up' element={<SignUp />} />
+      <Route path='' element={<PrivateRoute />}>
+        <Route path='/profile' element={<Profile />} />
+      </Route>
+    </Route>
+  )
+);
+````
+
+Toutes les routes privées doivent être  dans :
+
+````
+<Route path='' element={<PrivateRoute />}> 
+// ici
+</Route>
+````
+
+# Page Profile.jsx
+
+## UI PRofile
+
+s'inpirer des la page signUp
+
+````
+
+````

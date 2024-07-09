@@ -6,8 +6,8 @@ export default function Hero() {
   return (
     <div className=' py-5'>
     <Container className='d-flex justify-content-center '>
-        <Card className='p-5 d-flex flex-column align-items-center hero-card bg-light w-75 border border-success'>
-            <h1 className='text-center mb-4 text-success'> Bienvenue sur cette application MERN (MongoDB, Express, React,
+        <Card className='p-5 d-flex flex-column align-items-center hero-card bg-light w-75 border border-sucess'>
+            <h1 className='text-center mb-4 text-sucess'> Bienvenue sur cette application MERN (MongoDB, Express, React,
                 Node.js) avec Bootstrap.</h1>
             <p className='text-center mb-4'>
             Ceci est un modèle d&lsquo; application Web full-stack construite avec
@@ -21,7 +21,7 @@ export default function Hero() {
             </p>
             <div className='d-flex'>
                 <Link to='/sign-in'>
-                    <Button variant='outline-success'  className='me-3'>
+                    <Button variant='outline-dark'  className='me-3'>
                     <FaSignInAlt /> Connexion
                     </Button>
                 </Link>

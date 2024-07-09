@@ -51,7 +51,7 @@ export default function SignIn() {
 
   return (
     <FormContainer>
-      <h1 className="d-flex justify-content-center text-success">Connexion</h1>
+      <h1 className="d-flex justify-content-center text-dark">Connexion</h1>
 
       <Form onSubmit={handleSubmit}>
         <Form.Group className="my-2 ">
@@ -94,7 +94,7 @@ export default function SignIn() {
 
         <Button
           type="submit"
-          variant="outline-success"
+          variant="outline-dark"
           className="my-3 w-100"
           disabled={loading}
         >
@@ -109,7 +109,7 @@ export default function SignIn() {
       <Row className="py-3">
         <Col>
           Avez-vous un compte ?{" "}
-          <Link to="/sign-up" className="text-success">
+          <Link to="/sign-up" className="text-dark">
             Inscription
           </Link>
           {error && (

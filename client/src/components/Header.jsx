@@ -19,7 +19,7 @@ function Header() {
       bg="light"
       variant="light"
       data-bs-theme="light"
-      className="border-bottom border-success"
+      className="border-bottom border-dark"
     >
       <Container fluid>
         {/** Titre */}
@@ -33,19 +33,19 @@ function Header() {
             objectFit: "cover",
           }}
         />
-        <Navbar.Brand as={Link} to="/" className="text-success fs-4">
+        <Navbar.Brand as={Link} to="/" className="text-dark fs-4">
           Auth React-Bootstrap
         </Navbar.Brand>
 
         {/** Btns on small screens */}
         <div className="d-lg-none d-flex align-items-center">
           <Nav.Link as={Link} to="/sign-in" className="p-0">
-            <Button variant="success" className="mx-1">
+            <Button variant="dark" className="mx-1">
               <FaSignInAlt /> Connexion
             </Button>
           </Nav.Link>
           <Nav.Link as={Link} to="/sign-up" className="p-0">
-            <Button variant="outline-success" className="mx-1">
+            <Button variant="outline-dark" className="mx-1">
               <FaSignOutAlt /> Inscription
             </Button>
           </Nav.Link>
@@ -60,10 +60,10 @@ function Header() {
         >
           <div className="d-flex justify-content-center flex-grow-1">
             <Nav className="mx-auto mb-2 mb-lg-0">
-              <Nav.Link as={Link} to="/" className="my-auto text-success">
+              <Nav.Link as={Link} to="/" className="my-auto text-dark">
                 Home
               </Nav.Link>
-              <Nav.Link as={Link} to="/about" className="my-auto text-success">
+              <Nav.Link as={Link} to="/about" className="my-auto text-dark">
                 A propos
               </Nav.Link>
             </Nav>
@@ -85,7 +85,7 @@ function Header() {
                       e.target.onerror = null;
                       e.target.src = "defaultProfilePicture.png";
                     }}
-                    className="border border-success"
+                    className="border border-dark"
                     style={{
                       height: "3.5rem",
                       width: "3.5rem",
@@ -97,7 +97,7 @@ function Header() {
             ) : (
               <>
                 <Nav.Link as={Link} to="/sign-in" className="p-0">
-                  <Button variant="outline-success" className="mx-1">
+                  <Button variant="outline-dark" className="mx-1">
                     <FaSignInAlt /> Connexion
                   </Button>
                 </Nav.Link>

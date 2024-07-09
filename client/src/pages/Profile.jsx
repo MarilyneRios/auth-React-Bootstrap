@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"; 
+import { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Image } from "react-bootstrap";
@@ -21,7 +21,7 @@ export default function Profile() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const fileRef = useRef(null); 
+  const fileRef = useRef(null);
 
   // Fonction de gestion du changement de valeur des champs du formulaire
   const handleChange = (e) => {
@@ -31,8 +31,7 @@ export default function Profile() {
 
   // Fonction de validation de fichier (exemple)
   const validateFile = (file) => {
-   
-    return true; 
+    return true;
   };
 
   // Fonction de soumission du formulaire
@@ -41,8 +40,8 @@ export default function Profile() {
 
     try {
       console.log(formData);
-    
-      navigate('/'); 
+
+      navigate("/");
     } catch (error) {
       console.error("Erreur lors de la soumission du formulaire :", error);
     }
@@ -54,15 +53,14 @@ export default function Profile() {
     <FormContainer>
       <h1 className="d-flex justify-content-center text-dark">Profil</h1>
       <Form onSubmit={handleSubmit}>
-       {/* Image de profil */}
+        {/* Image de profil */}
         <Form.Group className="my-2 d-flex justify-content-center ">
-         
           <Image
             src={formData.profilePicture || currentUser.profilePicture}
             alt="image de profil"
             className="cursor-pointer rounded-circle object-cover mt-2 border border-dark"
             style={{ width: "100px", height: "100px" }}
-            onClick={() => fileRef.current.click()} 
+            onClick={() => fileRef.current.click()}
           />
           <Form.Control
             type="file"
@@ -72,7 +70,10 @@ export default function Profile() {
             onChange={(e) => {
               const file = e.target.files[0];
               if (validateFile(file)) {
-                setFormData({ ...formData, profilePicture: URL.createObjectURL(file) });
+                setFormData({
+                  ...formData,
+                  profilePicture: URL.createObjectURL(file),
+                });
               }
             }}
           />
@@ -154,9 +155,33 @@ export default function Profile() {
           </div>
         </Form.Group>
 
-        <Button type="submit" variant="outline-dark" className="my-3 w-100" disabled={loading}>
+        <Button
+          type="submit"
+          variant="outline-dark"
+          className="my-3 w-100"
+          disabled={loading}
+        >
           Enregistrer
         </Button>
+        <div className="d-flex justify-content-between mt-3">
+        <span
+         
+          className="btn text-danger "
+        >
+          Supprimer le compte
+        </span>
+
+        <span className="btn text-danger ">
+          Déconnexion
+        </span>
+      </div>
+        <div>
+          <p className="text-danger mt-5">{"Quelque chose ne pas !"}</p>
+
+          <p className="text-danger mt-5">
+            {"Les modifications sont mise à jour avec succès !"}
+          </p>
+        </div>
       </Form>
     </FormContainer>
   );

@@ -2710,3 +2710,96 @@ const handleFileUpload = async (image) => {
     return true;
   };
   ````
+
+  5. chargement de l'image
+
+
+  > npm install react-spinners
+
+  > inclure le cercle de chargement :
+
+````
+  import { RingLoader } from "react-spinners";
+````
+
+````
+  const [imagePercent, setImagePercent] = useState(0);
+  console.log(imagePercent);
+
+````
+
+````
+ uploadTask.on(
+  "state_changed",
+  (snapshot) => {
+    // Calcul du pourcentage de progression du téléchargement
+    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    // Mise à jour de l'état de progression de l'image
+    setImagePercent(Math.round(progress));
+  },
+  (error) => {
+    // Affichage de l'erreur dans la console
+    console.error(error);
+    // Mise à jour de l'état de l'erreur de l'image
+    setImageError("Erreur lors du téléchargement de l'image");
+  },
+  () => {
+    // Obtention de l'URL de téléchargement une fois le téléchargement terminé
+    getDownloadURL(uploadTask.snapshot.ref)
+      .then((downloadURL) => {
+        // Mise à jour des données du formulaire avec l'URL de l'image téléchargée
+        setFormData((prevData) => ({
+          ...prevData,
+          profilePicture: downloadURL,
+        }));
+        // Indication que la mise à jour a réussi
+        setUpdateSuccess(true);
+        // Mise à jour de l'état de progression de l'image à 100%
+        setImagePercent(100);
+      })
+      .catch((error) => {
+        // Affichage de l'erreur dans la console
+        console.error(error);
+        // Mise à jour de l'état de l'erreur de l'image
+        setImageError("Erreur lors de l'obtention de l'URL de téléchargement");
+      });
+  }
+);
+
+````        
+
+````
+    {/* Image de profil */}
+ <Form.Group className="my-2 d-flex justify-content-center">
+  <div className="position-relative d-flex flex-column align-items-center" style={{ width: "100px", height: "130px" }}>
+    <div className="position-relative cursor-pointer" style={{ width: "100px", height: "100px" }} onClick={() => fileRef.current.click()}>
+      <Image src={formData.profilePicture || currentUser.profilePicture} alt="image de profil" className="rounded-circle object-cover border border-dark" style={{ width: "100px", height: "100px" }} />
+      {imagePercent > 0 && imagePercent < 100 && (
+        <div className="position-absolute top-50 start-50 translate-middle" style={{ width: "100px", height: "100px" }}>
+          <RingLoader size={100} color="#208537" loading={true} />
+        </div>
+      )}
+    </div>
+    <p className="text-center mt-2" style={{ display: "inline-block", width: "250px" }}>
+      {imageError ? (
+        <span className="text-danger">{imageError}</span>
+      ) : imagePercent > 0 && imagePercent < 100 ? (
+        <span className="text-dark">{`Téléchargement : ${imagePercent}%`}</span>
+      ) : imagePercent === 100 ? (
+        <span className="text-success">Image téléchargée avec succès</span>
+      ) : (
+        ""
+      )}
+    </p>
+  </div>
+  <Form.Control type="file" accept="image/*" ref={fileRef} hidden onChange={(e) => {
+    const file = e.target.files[0];
+    if (validateFile(file)) {
+      setImagePercent(0);
+      setImage(file);
+    }
+  }} />
+  {imageError && (<p className="text-danger text-center">{imageError}</p>)}
+</Form.Group>
+
+````

@@ -4,8 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { Form, Button, Image } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import {  getDownloadURL,  getStorage,  ref,  uploadBytesResumable,} from 'firebase/storage';
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { app } from "../firebase";
+import { RingLoader } from "react-spinners"; // Import the spinner
 
 export default function Profile() {
   const { currentUser, loading } = useSelector((state) => state.user);
@@ -21,11 +27,11 @@ export default function Profile() {
   const [visibleConfirmPassword, setVisibleConfirmPassword] = useState(false);
   const [localError, setLocalError] = useState("");
 
-  //états pour upload images
+  // états pour upload images
   const [image, setImage] = useState(undefined);
-
   const [imagePercent, setImagePercent] = useState(0);
-  const [imageError, setImageError] = useState("");
+  console.log(imagePercent);
+  const [imageError, setImageError] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
   // Vérifie si 'image' a une valeur. Si oui, la fonction handleFileUpload est appelée
@@ -40,20 +46,34 @@ export default function Profile() {
     const fileName = new Date().getTime() + image.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, image);
+
     uploadTask.on(
-      'state_changed',
+      "state_changed",
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setImagePercent(Math.round(progress));
       },
       (error) => {
-        setImageError(true);
+        console.error(error);
+        setImageError("Erreur lors du téléchargement de l'image");
       },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-          setFormData({ ...formData, profilePicture: downloadURL })
-        );
+        getDownloadURL(uploadTask.snapshot.ref)
+          .then((downloadURL) => {
+            setFormData((prevData) => ({
+              ...prevData,
+              profilePicture: downloadURL,
+            }));
+            setUpdateSuccess(true);
+            setImagePercent(100);
+          })
+          .catch((error) => {
+            console.error(error);
+            setImageError(
+              "Erreur lors de l'obtention de l'URL de téléchargement"
+            );
+          });
       }
     );
   };
@@ -71,11 +91,12 @@ export default function Profile() {
 
   // Fonction de validation de fichier (si erreur)
   const validateFile = (file) => {
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       setImageError("Le fichier doit être une image");
       return false;
     }
-    if (file.size > 2 * 1024 * 1024) { // 2 MB
+    if (file.size > 2 * 1024 * 1024) {
+      // 2 MB
       setImageError("L'image doit être inférieure à 2 Mo");
       return false;
     }
@@ -102,15 +123,50 @@ export default function Profile() {
     <FormContainer>
       <h1 className="d-flex justify-content-center text-dark">Profil</h1>
       <Form onSubmit={handleSubmit}>
+      
         {/* Image de profil */}
-        <Form.Group className="my-2 d-flex justify-content-center ">
-          <Image
-            src={formData.profilePicture || currentUser.profilePicture}
-            alt="image de profil"
-            className="cursor-pointer rounded-circle object-cover mt-2 border border-dark"
-            style={{ width: "100px", height: "100px" }}
-            onClick={() => fileRef.current.click()}
-          />
+        <Form.Group className="my-2 d-flex justify-content-center">
+          <div
+            className="position-relative d-flex flex-column align-items-center"
+            style={{ width: "100px", height: "130px" }}
+          >
+            <div
+              className="position-relative cursor-pointer"
+              style={{ width: "100px", height: "100px" }}
+              onClick={() => fileRef.current.click()}
+            >
+              <Image
+                src={formData.profilePicture || currentUser.profilePicture}
+                alt="image de profil"
+                className="rounded-circle object-cover border border-dark"
+                style={{ width: "100px", height: "100px" }}
+              />
+              {imagePercent > 0 && imagePercent < 100 && (
+                <div
+                  className="position-absolute top-50 start-50 translate-middle"
+                  style={{ width: "100px", height: "100px" }}
+                >
+                  <RingLoader size={100} color="#208537" loading={true} />
+                </div>
+              )}
+            </div>
+            <p
+              className="text-center mt-2"
+              style={{ display: "inline-block", width: "250px" }}
+            >
+              {imageError ? (
+                <span className="text-danger">{imageError}</span>
+              ) : imagePercent > 0 && imagePercent < 100 ? (
+                <span className="text-dark">{`Téléchargement : ${imagePercent}%`}</span>
+              ) : imagePercent === 100 ? (
+                <span className="text-success">
+                  Image téléchargée avec succès
+                </span>
+              ) : (
+                ""
+              )}
+            </p>
+          </div>
           <Form.Control
             type="file"
             accept="image/*"
@@ -124,8 +180,9 @@ export default function Profile() {
               }
             }}
           />
-           {imageError && <p className="text-danger text-center">{imageError}</p>}
-
+          {imageError && (
+            <p className="text-danger text-center">{imageError}</p>
+          )}
         </Form.Group>
 
         <Form.Group className="my-2">
@@ -214,14 +271,12 @@ export default function Profile() {
         </Button>
         <div className="d-flex justify-content-between mt-3">
           <span className="btn text-danger ">Supprimer le compte</span>
-
           <span className="btn text-danger ">Déconnexion</span>
         </div>
         <div>
-          <p className="text-danger mt-5">{"Quelque chose ne pas !"}</p>
-
-          <p className="text-danger mt-5">
-            {"Les modifications sont mise à jour avec succès !"}
+          <p className="text-danger mt-5">{"Quelque chose ne va pas !"}</p>
+          <p className="text-success mt-5">
+            {"Les modifications sont mises à jour avec succès !"}
           </p>
         </div>
       </Form>

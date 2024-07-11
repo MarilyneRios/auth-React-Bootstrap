@@ -2317,5 +2317,396 @@ Toutes les routes privées doivent être  dans :
 s'inpirer des la page signUp
 
 ````
+import { useState, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Form, Button, Image } from "react-bootstrap";
+import FormContainer from "../components/FormContainer";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+export default function Profile() {
+  const { currentUser, loading } = useSelector((state) => state.user);
+  const [formData, setFormData] = useState({
+    username: currentUser.username,
+    email: currentUser.email,
+    password: "",
+    passwordConfirm: "",
+    profilePicture: currentUser.profilePicture,
+  });
+
+  const [visiblePassword, setVisiblePassword] = useState(false);
+  const [visibleConfirmPassword, setVisibleConfirmPassword] = useState(false);
+  const [localError, setLocalError] = useState("");
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const fileRef = useRef(null);
+
+  // Fonction de gestion du changement de valeur des champs du formulaire
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+  };
+
+  // Fonction de validation de fichier (exemple)
+  const validateFile = (file) => {
+    return true;
+  };
+
+  // Fonction de soumission du formulaire
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      console.log(formData);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Erreur lors de la soumission du formulaire :", error);
+    }
+  };
+
+  const { username, email, password, passwordConfirm } = formData;
+
+  return (
+    <FormContainer>
+      <h1 className="d-flex justify-content-center text-dark">Profil</h1>
+      <Form onSubmit={handleSubmit}>
+        {/* Image de profil */}
+        <Form.Group className="my-2 d-flex justify-content-center ">
+          <Image
+            src={formData.profilePicture || currentUser.profilePicture}
+            alt="image de profil"
+            className="cursor-pointer rounded-circle object-cover mt-2 border border-dark"
+            style={{ width: "100px", height: "100px" }}
+            onClick={() => fileRef.current.click()}
+          />
+          <Form.Control
+            type="file"
+            accept="image/*"
+            ref={fileRef}
+            hidden
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (validateFile(file)) {
+                setFormData({
+                  ...formData,
+                  profilePicture: URL.createObjectURL(file),
+                });
+              }
+            }}
+          />
+        </Form.Group>
+
+        <Form.Group className="my-2">
+          <Form.Control
+            type="text"
+            id="username"
+            placeholder="Pseudo"
+            value={username}
+            onChange={handleChange}
+            autoComplete="username"
+          />
+        </Form.Group>
+
+        <Form.Group className="my-2">
+          <Form.Control
+            type="email"
+            id="email"
+            placeholder="Email"
+            value={email}
+            onChange={handleChange}
+            autoComplete="email"
+          />
+        </Form.Group>
+
+        <Form.Group className="my-2">
+          <div className="d-flex">
+            <Form.Control
+              type={visiblePassword ? "text" : "password"}
+              id="password"
+              placeholder="Mot de passe"
+              value={password}
+              onChange={handleChange}
+              autoComplete="current-password"
+              className="me-2"
+            />
+            {visiblePassword ? (
+              <FaEyeSlash
+                onClick={() => setVisiblePassword(false)}
+                className="m-3"
+                size={20}
+              />
+            ) : (
+              <FaEye
+                onClick={() => setVisiblePassword(true)}
+                size={20}
+                className="m-3"
+              />
+            )}
+          </div>
+        </Form.Group>
+
+        <Form.Group className="my-2">
+          <div className="d-flex">
+            <Form.Control
+              type={visibleConfirmPassword ? "text" : "password"}
+              id="passwordConfirm"
+              placeholder="Confirmation du mot de passe"
+              value={passwordConfirm}
+              onChange={handleChange}
+              autoComplete="new-password"
+              className="me-2"
+            />
+            {visibleConfirmPassword ? (
+              <FaEyeSlash
+                onClick={() => setVisibleConfirmPassword(false)}
+                className="m-3"
+                size={20}
+              />
+            ) : (
+              <FaEye
+                onClick={() => setVisibleConfirmPassword(true)}
+                size={20}
+                className="m-3"
+              />
+            )}
+          </div>
+        </Form.Group>
+
+        <Button
+          type="submit"
+          variant="outline-dark"
+          className="my-3 w-100"
+          disabled={loading}
+        >
+          Enregistrer
+        </Button>
+        <div className="d-flex justify-content-between mt-3">
+        <span
+         
+          className="btn text-danger "
+        >
+          Supprimer le compte
+        </span>
+
+        <span className="btn text-danger ">
+          Déconnexion
+        </span>
+      </div>
+        <div>
+          <p className="text-danger mt-5">{"Quelque chose ne pas !"}</p>
+
+          <p className="text-danger mt-5">
+            {"Les modifications sont mise à jour avec succès !"}
+          </p>
+        </div>
+      </Form>
+    </FormContainer>
+  );
+}
 
 ````
+## Updload Images avec firebase
+
+1. Explication useRef()
+
+````
+const fileRef = useRef(null); 
+````
+=>  Crée une référence à un élément DOM ou à un composant React. Dans ce cas, elle est utilisée pour créer une référence à un élément de contrôle de formulaire de type fichier.
+
+
+````
+<Form.Control
+    type="file"
+    accept="image/*"
+    ref={fileRef}
+    hidden
+    onChange={(e) => {
+      const file = e.target.files[0];
+      if (validateFile(file)) {
+       setFormData({...formData,
+                  profilePicture: URL.createObjectURL(file),
+       });
+      }
+   }}
+/>
+````         
+**Form.Control** de type **file** qui est caché (**hidden**). Il est lié avec **ref={fileRef}**, donc quand on clique sur l’image, cela déclenche un clic sur cet élément de contrôle de fichier, ce qui ouvre la boîte de dialogue de sélection de fichier. Pour finir, **accept="image/*"** afin d'accepter tous les type d'images.
+
+````
+<Image
+   src={formData.profilePicture || currentUser.profilePicture}
+   alt="image de profil"
+    className="cursor-pointer rounded-circle object-cover mt-2 border border-dark"
+    style={{ width: "100px", height: "100px" }}
+    onClick={() => fileRef.current.click()}
+/>
+````
+**onClick={() => fileRef.current.click()}**:
+
+- **fileRef** est une ****référence** à l’élément de contrôle de formulaire de type **file**. 
+- **current** est **une propriété de l’objet ref** qui renvoie l’élément DOM référencé. 
+- **click()** est une méthode qui simule un clic de l’utilisateur sur cet élément DOM.
+
+- En bref, quand l’utilisateur clique sur l’image, cela déclenche un clic sur l’élément de contrôle de fichier. Cela ouvre la boîte de dialogue de sélection de fichier, permettant à l’utilisateur de choisir un nouveau fichier à télécharger.
+
+> ps: une fonction callback ou  fonction de rappel qui est passée à une autre fonction en tant qu’argument et qui est exécutée après que certaines conditions ont été remplies.
+
+2. Firebase :
+
+- build ou créer
+
+- storage
+
+- get started ou commencer
+
+- set up cloud storage ou Configurer cloud storage:
+
+> start in production mode ou Démarrer en mode de production + next ou ok
+
+> choisir un emplacement proche + done ou ok
+
+> rules ou règles : 
+
+````
+rules_version = '2';
+
+// Craft rules based on data in your Firestore database
+// allow write: if firestore.get(
+//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read;
+      allow write: if
+      request.resource.size < 2 * 1024 * 1024 &&
+      request.resource.contentType.matches('image/.*')
+    }
+  }
+}
+````
++ publier
+
+-> **allow read;** : Cette règle permet à tous les users de lire tous les fichiers.
+
+-> **allow write: if request.resource.size < 2 _ 1024 _ 1024 && request.resource.contentType.matches('image/.*')** : Cette règle permet aux users d’écrire (télécharger) des fichiers si deux conditions sont validées :
+
+- ps : La taille du fichier est inférieure à 2 Mo (2 _ 1024 _ 1024 octets).
+Le type de contenu du fichier correspond à une image.
+Récupérer les images dans notre App
+
+
+### Fontions :
+
+1. Initialisation et sélection de l’image
+
+````
+ const [image, setImage] = useState(undefined);
+   console.log(image)
+```` 
+````
+<Form.Control
+  type="file"
+  accept="image/*"
+  ref={fileRef}
+        hidden
+  onChange={(e) => {
+    const file = e.target.files[0];
+    if (validateFile(file)) {
+      setImagePercent(0);
+      setImage(file);
+    }
+  }}
+/>
+````
+
+on obtient quelque chose comme ceci:
+````
+ File {
+    name: 'Capture d\'écran 2023-06-12 070848.png',
+    lastModified: 1686546527435,
+    lastModifiedDate: new Date('2023-06-12T05:08:47.000Z'),
+    webkitRelativePath: '',
+    size: 148829,
+    type: 'image/png'
+  }
+````
+> Pour télécharger l'image dans le storage et notre dataBase => useEffect
+
+````
+import { useState, useRef,useEffect } from "react";
+````
+2. Téléchargement de l’image avec useEffect et handleFileUpload
+
+````
+ useEffect(() => {
+    if (image) {
+      handleFileUpload(image);
+    }
+  }, [image]);
+````  
+
+````
+  const handleFileUpload = async (image) => {
+    console.log(image);
+  };
+````
+
+=> On va pouvoir l'ajouter à notre storage
+
+3. Intégration avec le stockage Firebase
+
+````
+import {  getDownloadURL,  getStorage,  ref,  uploadBytesResumable,} from 'firebase/storage';
+import { app } from "../firebase";
+````
+
+````
+const [imagePercent, setImagePercent] = useState(0);
+const [imageError, setImageError] = useState("");
+const [updateSuccess, setUpdateSuccess] = useState(false);
+````  
+
+````
+const handleFileUpload = async (image) => {
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + image.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImagePercent(Math.round(progress));
+      },
+      (error) => {
+        setImageError(true);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
+          setFormData({ ...formData, profilePicture: downloadURL })
+        );
+      }
+    );
+  };
+ ```` 
+
+ 4. Message si pbm avec l'image
+
+ ````
+   const validateFile = (file) => {
+    if (!file.type.startsWith('image/')) {
+      setImageError("Le fichier doit être une image");
+      return false;
+    }
+    if (file.size > 2 * 1024 * 1024) { // 2 MB
+      setImageError("L'image doit être inférieure à 2 Mo");
+      return false;
+    }
+    setImageError(""); // Réinitialiser les erreurs
+    return true;
+  };
+  ````

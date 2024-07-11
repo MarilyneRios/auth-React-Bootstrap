@@ -1,9 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Image } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {  getDownloadURL,  getStorage,  ref,  uploadBytesResumable,} from 'firebase/storage';
+import { app } from "../firebase";
 
 export default function Profile() {
   const { currentUser, loading } = useSelector((state) => state.user);
@@ -19,8 +21,46 @@ export default function Profile() {
   const [visibleConfirmPassword, setVisibleConfirmPassword] = useState(false);
   const [localError, setLocalError] = useState("");
 
+  //états pour upload images
+  const [image, setImage] = useState(undefined);
+
+  const [imagePercent, setImagePercent] = useState(0);
+  const [imageError, setImageError] = useState("");
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+
+  // Vérifie si 'image' a une valeur. Si oui, la fonction handleFileUpload est appelée
+  useEffect(() => {
+    if (image) {
+      handleFileUpload(image);
+    }
+  }, [image]);
+
+  const handleFileUpload = async (image) => {
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + image.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImagePercent(Math.round(progress));
+      },
+      (error) => {
+        setImageError(true);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
+          setFormData({ ...formData, profilePicture: downloadURL })
+        );
+      }
+    );
+  };
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const fileRef = useRef(null);
 
   // Fonction de gestion du changement de valeur des champs du formulaire
@@ -29,8 +69,17 @@ export default function Profile() {
     setFormData({ ...formData, [id]: value });
   };
 
-  // Fonction de validation de fichier (exemple)
+  // Fonction de validation de fichier (si erreur)
   const validateFile = (file) => {
+    if (!file.type.startsWith('image/')) {
+      setImageError("Le fichier doit être une image");
+      return false;
+    }
+    if (file.size > 2 * 1024 * 1024) { // 2 MB
+      setImageError("L'image doit être inférieure à 2 Mo");
+      return false;
+    }
+    setImageError(""); // Réinitialiser les erreurs
     return true;
   };
 
@@ -70,13 +119,13 @@ export default function Profile() {
             onChange={(e) => {
               const file = e.target.files[0];
               if (validateFile(file)) {
-                setFormData({
-                  ...formData,
-                  profilePicture: URL.createObjectURL(file),
-                });
+                setImagePercent(0);
+                setImage(file);
               }
             }}
           />
+           {imageError && <p className="text-danger text-center">{imageError}</p>}
+
         </Form.Group>
 
         <Form.Group className="my-2">
@@ -164,17 +213,10 @@ export default function Profile() {
           Enregistrer
         </Button>
         <div className="d-flex justify-content-between mt-3">
-        <span
-         
-          className="btn text-danger "
-        >
-          Supprimer le compte
-        </span>
+          <span className="btn text-danger ">Supprimer le compte</span>
 
-        <span className="btn text-danger ">
-          Déconnexion
-        </span>
-      </div>
+          <span className="btn text-danger ">Déconnexion</span>
+        </div>
         <div>
           <p className="text-danger mt-5">{"Quelque chose ne pas !"}</p>
 

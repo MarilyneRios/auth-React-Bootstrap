@@ -287,7 +287,7 @@ export default function Profile() {
           className="my-3 w-100"
           disabled={loading}
         >
-          Enregistrer
+           {loading ? 'Loading...' : 'Enregistrer'}
         </Button>
         <div className="d-flex justify-content-between mt-3">
           <span className="btn text-danger ">Supprimer le compte</span>

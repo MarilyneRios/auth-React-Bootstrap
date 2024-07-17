@@ -2548,7 +2548,7 @@ const fileRef = useRef(null);
 
 - **fileRef** est une ****référence** à l’élément de contrôle de formulaire de type **file**. 
 - **current** est **une propriété de l’objet ref** qui renvoie l’élément DOM référencé. 
-- **click()** est une méthode qui simule un clic de l’utilisateur sur cet élément DOM.
+- **click()** est une méthode qui simule un clic ddu User sur cet élément DOM.
 
 - En bref, quand l’utilisateur clique sur l’image, cela déclenche un clic sur l’élément de contrôle de fichier. Cela ouvre la boîte de dialogue de sélection de fichier, permettant à l’utilisateur de choisir un nouveau fichier à télécharger.
 
@@ -2803,3 +2803,156 @@ const handleFileUpload = async (image) => {
 </Form.Group>
 
 ````
+## Update images coté serveur API
+
+### api > routes > userRoutes.js
+
+````
+import express from 'express';
+import {display,  updateUser,
+} from '../controllers/userController.js'
+import { verifyToken } from '../utils/verifyUser.js';
+
+const router = express.Router();
+
+router.get('/', display);
+router.post('/update/:id', verifyToken, updateUser);
+
+export default router;
+````
+
+- **router.post('/update/:id', verifyToken, updateUser);** associe la méthode POST à la fonction updateUser, en passant un paramètre id.
+- Rappels : La méthode POST est principalement utilisée pour soumettre des données au serveur pour la création ou mise à jour. La méthode POST envoie les données dans le corps de la requête HTTP(S) contrairement à la méthode GET, qui envoie des données via l’URL.
+
+#### utils > verifyUser.js
+
+1. cookies :
+
+- **const token = req.cookies.access_token;**
+On déclare une variable **token**, qui récupère la valeur du cookie nommé access_token à partir de l’objet req.cookies. Ce qui signifie qu'elle  stocke le jeton d’accès (ou “token”) dans la variable token.
+
+> On doit installer cookie-parser : npm i cookie-parser côté api.
+
+C'est un middleware pour Express.js qui facilite la gestion des cookies.
+
+https://www.npmjs.com/package/cookie-parser
+
+- **if (!token) return next(errorHandler(401, 'Problem authentication!'));** : Si aucun token n’est présent, la fonction appelle next avec une erreur indiquant que le user n’est pas authentifié.
+
+- **jwt.verify(token, process.env.JWT_SECRET, (err, user) => { ... });** : Vérifie le token JWT. process.env.JWT_SECRET est la clé secrète utilisée pour vérifier le token.
+
+- **if (err) return next(errorHandler(403, 'Token is not valid!'));** : Si une erreur se produit lors de la vérification du token, la fonction appelle next avec une erreur indiquant que le token n’est pas valide.
+
+- **req.user = user; next();** : Si le token est valide, le token est décodé du token et attaché à la requête et la fonction next est appelée pour passer au prochain middleware.
+
+````
+import jwt from 'jsonwebtoken';
+import { errorHandler } from './error.js';
+
+export const verifyToken = (req, res, next) => {
+    const token = req.cookies.access_token;
+
+    if (!token) return next(errorHandler(401, 'You are not authenticated!'));
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return next(errorHandler(403, 'Token is not valid!'));
+
+        req.user = user;
+        next();
+    });
+
+
+}
+````
+### index.js
+
+````
+import express from 'express';
+import dotenv from 'dotenv';
+import connectDB from './config/db.js';
+import userRoutes from './routes/userRoutes.js'
+import authRoutes from './routes/authRoute.js';
+import cookieParser from 'cookie-parser';
+
+dotenv.config();
+connectDB();
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middleware pour parser le JSON
+app.use(express.json()); 
+// Middleware pour parser cookies
+
+//Routes
+app.use('/api/user', userRoutes);  
+app.use('/api/auth', authRoutes);
+
+//.....
+
+
+````
+
+### userController.js
+
+1. Vérification du USER **if (req.user.id !== req.params.id)**: Vérifie si l’ID du USER est le même que l’ID du USER qui est censé être mis à jour. 
+
+Si ce n’est pas le cas, erreur 401, indiquant qudu User ne peut mettre à jour que son propre compte.
+
+2. Mise à jour du mot de passe : Si le mot de passe est fourni dans la demande, on est crypté avant d’être stocké **pour la sécurité des données**.
+
+3. Mise à jour du User : Ensuite, on utilise la méthode **findByIdAndUpdate** de l’objet **User** pour mettre à jour du User dans la base de données. on met à jour les champs username, email, password et profilePicture avec les nouvelles valeurs fournies dans la demande.
+
+4. Réponse : Si la mise à jour est réussie, on renvoie le nouvel User (sans le mot de passe pour des raisons de sécurité) avec un statut 200, indiquant que la demande a été traitée avec succès.
+
+5. Gestion des erreurs : Si une erreur se produit à un moment quelconque, elle est capturée et passée à la fonction next pour être traitée par le gestionnaire d’erreurs.
+
+````
+import User from '../models/user.model.js';
+import { errorHandler } from '../utils/error.js';
+import bcryptjs from 'bcryptjs';
+
+//.....
+
+// Mise à jour le user
+export const updateUser = async (req, res, next) => {
+  //sécurité vérif user
+  if (req.user.id !== req.params.id) {
+    return next(errorHandler(401, 'You can update only your account!'));
+  }
+  try {
+    if (req.body.password) {
+      req.body.password = bcryptjs.hashSync(req.body.password, 10);
+    }
+// pour mettre à jour l'utilisateur dans la base de données
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          username: req.body.username,
+          email: req.body.email,
+          password: req.body.password,
+          profilePicture: req.body.profilePicture,
+        },
+      },
+      { new: true }
+    );
+// Si la mise à jour est réussie, renvoie le nouvel utilisateur 
+    const { password, ...rest } = updatedUser._doc;
+    res.status(200).json(rest);
+  } catch (error) {
+    // Si une erreur passée à la fonction next pour être traitée par le gestionnaire d'erreurs    
+    next(error);
+  }
+}  
+````
+
+### test avec thunderClient ou insomnia
+
+1. modification username
+
+ps: pensez bien à sign in avant
+
+2. Vérifer dans MongoDB
+
+3. Vérifer dans le navigateur (frontend)

@@ -2951,8 +2951,195 @@ export const updateUser = async (req, res, next) => {
 
 1. modification username
 
+> POST: localhost:3000/api/user/update/id
+
+````
+{
+	"username": "manu update"
+}
+````
+
 ps: pensez bien à sign in avant
 
 2. Vérifer dans MongoDB
 
 3. Vérifer dans le navigateur (frontend)
+
+
+## Relier update image front et back
+
+### client > Profile.jsx
+
+1. Gestion du Formulaire et Affichage des Données dans la Console
+
+````
+  // Fonction de gestion du changement de valeur des champs du formulaire
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setLocalError("");
+  };
+
+  //.....
+
+   // Fonction de soumission du formulaire
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      console.log(formData);
+      
+    } catch (error) {
+      console.error("Erreur lors de la soumission du formulaire :", error);
+    }
+  };
+````
+
+Dans la console : 
+
+````
+formData:
+  username: 'manu ',
+
+  email: 'manu@gmail.com',
+
+  password: '',
+
+  passwordConfirm: '',
+
+  profilePicture: 
+
+    'https://img.freepik.com/premium-vector/man-avatar-profile-picture-vector-illustration_268834-538.jpg'
+
+````
+2. client > redux > userSlice.js
+
+
+Trois états possibles : 
+- le chargement (lorsque la demande est en cours), 
+- le succès (lorsque la demande a réussi) 
+- et l’échec (lorsque la demande a échoué)
+
+> Afin d'aider à gérer l’état de l’application de manière efficace et prévisible, tout en facilitant le débogage et la gestion de l’état asynchrone
+````
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  currentUser: null,
+  loading: false,
+  error: false,
+};
+
+const userSlice = createSlice({
+  name: 'user',
+  initialState,
+  reducers: {
+    signInStart: (state) => {
+      state.loading = true;
+    },
+    signInSuccess: (state, action) => {
+      state.currentUser = action.payload;
+      state.loading = false;
+      state.error = false;
+    },
+    signInFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    updateUserStart: (state) => {
+      state.loading = true;
+    },
+    updateUserSuccess: (state, action) => {
+      state.currentUser = action.payload;
+      state.loading = false;
+      state.error = false;
+    },
+    updateUserFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+  },
+});
+
+export const {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
+} = userSlice.actions;
+
+export default userSlice.reducer;
+````
+
+3. handleSubmit
+
+
+````
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+  signOut,
+} from "../redux/userSlice";
+````
+
+- Prévenir le comportement par défaut : e.preventDefault(); est utilisé pour empêcher le comportement par défaut du navigateur lors de la soumission d’un formulaire, qui est de recharger la page.
+
+- Vérifier la correspondance des mots de passe : Elle vérifie si le mot de passe et la confirmation du mot de passe sont identiques. Si ce n’est pas le cas, elle définit une erreur locale avec le message “Les mots de passe ne correspondent pas !” et arrête l’exécution de la fonction.
+
+- Début de la mise à jour de l’utilisateur : Elle envoie une action updateUserStart pour signaler le début de la mise à jour de l’utilisateur.
+
+- Envoi de la requête de mise à jour : Elle envoie une requête POST à l’API pour mettre à jour les informations de l’utilisateur. Les données du formulaire sont converties en JSON et incluses dans le corps de la requête.
+
+- Traitement de la réponse : Elle attend la réponse de l’API, la convertit en JSON, puis vérifie si la mise à jour a réussi. Si la mise à jour a échoué (data.success === false), elle envoie une action updateUserFailure avec les données reçues et arrête l’exécution de la fonction.
+
+- Succès de la mise à jour : Si la mise à jour a réussi, elle envoie une action updateUserSuccess avec les données reçues et définit setUpdateSuccess à true.
+
+- Gestion des erreurs : Si une erreur se produit lors de l’envoi de la requête à l’API, elle envoie une action updateUserFailure avec l’erreur.
+
+
+````
+// Fonction de soumission du formulaire
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.passwordConfirm) {
+      setLocalError("Les mots de passe ne correspondent pas !");
+      return;
+    }
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data));
+        return;
+      }
+      dispatch(updateUserSuccess(data));
+      setUpdateSuccess(true);
+    } catch (error) {
+      dispatch(updateUserFailure(error));
+    }
+  };
+  ````
+
+4. Message d'erreur ou réussite
+
+````
+        <div>
+          <p className="text-danger mt-5">{localError && "Quelque chose ne va pas !"}</p>
+          <p className="text-success mt-5">
+            {updateSuccess && "Les modifications sont mises à jour avec succès !"}
+          </p>
+        </div>
+
+````

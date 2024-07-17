@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { Form, Button, Image } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -12,6 +11,11 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { RingLoader } from "react-spinners"; // Import the spinner
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} from "../redux/userSlice";
 
 export default function Profile() {
   const { currentUser, loading } = useSelector((state) => state.user);
@@ -30,7 +34,7 @@ export default function Profile() {
   // états pour upload images
   const [image, setImage] = useState(undefined);
   const [imagePercent, setImagePercent] = useState(0);
-  console.log(imagePercent);
+ // console.log(imagePercent);
   const [imageError, setImageError] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
@@ -41,6 +45,7 @@ export default function Profile() {
     }
   }, [image]);
 
+  //Update images
   const handleFileUpload = async (image) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + image.name;
@@ -79,15 +84,15 @@ export default function Profile() {
   };
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
+ 
   const fileRef = useRef(null);
 
   // Fonction de gestion du changement de valeur des champs du formulaire
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setLocalError("");
   };
+  console.log(formData)
 
   // Fonction de validation de fichier (si erreur)
   const validateFile = (file) => {
@@ -107,13 +112,28 @@ export default function Profile() {
   // Fonction de soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (formData.password !== formData.passwordConfirm) {
+      setLocalError("Les mots de passe ne correspondent pas !");
+      return;
+    }
     try {
-      console.log(formData);
-
-      navigate("/");
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data));
+        return;
+      }
+      dispatch(updateUserSuccess(data));
+      setUpdateSuccess(true);
     } catch (error) {
-      console.error("Erreur lors de la soumission du formulaire :", error);
+      dispatch(updateUserFailure(error));
     }
   };
 
@@ -274,9 +294,9 @@ export default function Profile() {
           <span className="btn text-danger ">Déconnexion</span>
         </div>
         <div>
-          <p className="text-danger mt-5">{"Quelque chose ne va pas !"}</p>
+          <p className="text-danger mt-5">{localError && "Quelque chose ne va pas !"}</p>
           <p className="text-success mt-5">
-            {"Les modifications sont mises à jour avec succès !"}
+            {updateSuccess && "Les modifications sont mises à jour avec succès !"}
           </p>
         </div>
       </Form>

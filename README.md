@@ -3370,3 +3370,209 @@ import {
  <span className="btn text-danger " onClick={handleSignOut} >Déconnexion</span>
 
 ````
+
+# About.jsx
+
+````
+import { Container, Card,  } from 'react-bootstrap';
+
+export default function About() {
+  return (
+    <div className=' py-5'>
+    <Container className='d-flex justify-content-center '>
+        <Card className='p-5 d-flex flex-column align-items-center hero-card bg-light w-75 border border-dark '>
+            <h1 className='text-center mb-4 '>   Pourquoi cette application ?</h1>
+            <p className='text-center mb-4'>
+            Suite à une mésaventure, j&apos;ai construis divers modèles
+        d&apos;applications avec un système d&apos;authentification. Après 2 mois
+        de travail avec une application qui fonctionnait parfaitement en local
+        et l&apos;impossibilité de la déployer, je me suis donc mis en quête
+        des starters avec différents outils ici j&apos;ai utilisé Bootstrap.
+            </p>
+            <p className='text-center mb-4'>
+            Une application utilisant la pile MERN (MongoDB, Express.js, React-Vite,
+        Node.js) avec Bootstrap pour le style qui permet aux utilisateurs de
+        s&apos;inscrire, de se connecter et de se déconnecter, puis fournit
+        également un accès aux routes protégées uniquement pour les utilisateurs
+        authentifiés.
+      </p>
+      <p className='text-center mb-4'>
+      - Le front-end de l&apos;application est construit avec React et
+      React-Router-Dom pour le routage côté client.
+      </p>
+      <p className='text-center mb-4'>
+      - Le back-end est construit avec Node.js et Express puis MongoDB pour la
+      base de données noSQL.
+      </p>
+      <p className='text-center mb-4'>
+      - L&apos;authentification est implémentée en utilisant JSON Web Tokens
+      (JWT) et des cookies.
+      </p>
+      <p className='text-center mb-4'>
+      Un point de départ pour construire des applications Web full-stack MERN
+        avec authentification. Déployez-la quand ce tutoriel est terminé, avant
+        de continuer de construire votre projet afin d&apos;être sûr que tout
+        fonctionne correctement.
+      </p>
+
+        </Card>
+    </Container>
+ </div>
+  )
+}
+````
+
+
+# Bugs 
+
+## header en petit écran pbm btns au lieu de la photo
+
+````
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import { FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
+import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
+import { Image } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import Logo from "../assets/logoDevGreen.png";
+
+function Header() {
+  const { currentUser } = useSelector((state) => state.user);
+
+  const dispatch = useDispatch();
+
+  return (
+    <Navbar
+      expand="lg"
+      bg="light"
+      variant="light"
+      data-bs-theme="light"
+      className="border-bottom border-dark"
+    >
+      <Container fluid>
+        {/** Titre */}
+        <Image
+          src={Logo}
+          className="rounded-circle mx-3 img-fluid"
+          alt="Logo"
+          style={{
+            height: "3rem",
+            width: "3rem",
+            objectFit: "cover",
+          }}
+        />
+        <Navbar.Brand as={Link} to="/" className="text-dark fs-4">
+          Auth React-Bootstrap
+        </Navbar.Brand>
+
+        {/** Btns or profile picture on small screens */}
+        <div className="d-lg-none d-flex align-items-center">
+          {currentUser ? (
+            <Link
+              to="/profile"
+              className="text-dark"
+              style={{ textDecoration: "none" }}
+            >
+              <Image
+                src={currentUser.profilePicture}
+                alt="profile"
+                roundedCircle
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "defaultProfilePicture.png";
+                }}
+                className="border border-dark"
+                style={{
+                  height: "3.5rem",
+                  width: "3.5rem",
+                  objectFit: "cover",
+                }}
+              />
+            </Link>
+          ) : (
+            <>
+              <Nav.Link as={Link} to="/sign-in" className="p-0">
+                <Button variant="dark" className="mx-1">
+                  <FaSignInAlt /> Connexion
+                </Button>
+              </Nav.Link>
+              <Nav.Link as={Link} to="/sign-up" className="p-0">
+                <Button variant="outline-dark" className="mx-1">
+                  <FaSignOutAlt /> Inscription
+                </Button>
+              </Nav.Link>
+            </>
+          )}
+        </div>
+
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
+        {/** Liens and buttons on large screens */}
+        <Navbar.Collapse
+          id="basic-navbar-nav"
+          className="justify-content-between w-100"
+        >
+          <div className="d-flex justify-content-center flex-grow-1">
+            <Nav className="mx-auto mb-2 mb-lg-0">
+              <Nav.Link as={Link} to="/" className="my-auto text-dark">
+                Home
+              </Nav.Link>
+              <Nav.Link as={Link} to="/about" className="my-auto text-dark">
+                A propos
+              </Nav.Link>
+            </Nav>
+          </div>
+
+          <div className="d-none d-lg-flex align-items-center">
+            {currentUser ? (
+              <>
+                <Link
+                  to="/profile"
+                  className="text-dark"
+                  style={{ textDecoration: "none" }}
+                >
+                  <Image
+                    src={currentUser.profilePicture}
+                    alt="profile"
+                    roundedCircle
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "defaultProfilePicture.png";
+                    }}
+                    className="border border-dark"
+                    style={{
+                      height: "3.5rem",
+                      width: "3.5rem",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Link>
+              </>
+            ) : (
+              <>
+                <Nav.Link as={Link} to="/sign-in" className="p-0">
+                  <Button variant="outline-dark" className="mx-1">
+                    <FaSignInAlt /> Connexion
+                  </Button>
+                </Nav.Link>
+                <Nav.Link as={Link} to="/sign-up" className="p-0">
+                  <Button variant="success" className="mx-1">
+                    <FaSignOutAlt /> Inscription
+                  </Button>
+                </Nav.Link>
+              </>
+            )}
+          </div>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
+}
+
+export default Header;
+
+````
+
+## message d'erreur en anglais page connexion qui viennent de l'api

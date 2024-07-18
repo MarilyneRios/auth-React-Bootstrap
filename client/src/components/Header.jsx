@@ -37,18 +37,44 @@ function Header() {
           Auth React-Bootstrap
         </Navbar.Brand>
 
-        {/** Btns on small screens */}
+        {/** Btns or profile picture on small screens */}
         <div className="d-lg-none d-flex align-items-center">
-          <Nav.Link as={Link} to="/sign-in" className="p-0">
-            <Button variant="dark" className="mx-1">
-              <FaSignInAlt /> Connexion
-            </Button>
-          </Nav.Link>
-          <Nav.Link as={Link} to="/sign-up" className="p-0">
-            <Button variant="outline-dark" className="mx-1">
-              <FaSignOutAlt /> Inscription
-            </Button>
-          </Nav.Link>
+          {currentUser ? (
+            <Link
+              to="/profile"
+              className="text-dark"
+              style={{ textDecoration: "none" }}
+            >
+              <Image
+                src={currentUser.profilePicture}
+                alt="profile"
+                roundedCircle
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "defaultProfilePicture.png";
+                }}
+                className="border border-dark"
+                style={{
+                  height: "3.5rem",
+                  width: "3.5rem",
+                  objectFit: "cover",
+                }}
+              />
+            </Link>
+          ) : (
+            <>
+              <Nav.Link as={Link} to="/sign-in" className="p-0">
+                <Button variant="dark" className="mx-1">
+                  <FaSignInAlt /> Connexion
+                </Button>
+              </Nav.Link>
+              <Nav.Link as={Link} to="/sign-up" className="p-0">
+                <Button variant="outline-dark" className="mx-1">
+                  <FaSignOutAlt /> Inscription
+                </Button>
+              </Nav.Link>
+            </>
+          )}
         </div>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

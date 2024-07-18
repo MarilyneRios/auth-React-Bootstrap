@@ -6,8 +6,8 @@ export default function Hero() {
   return (
     <div className=' py-5'>
     <Container className='d-flex justify-content-center '>
-        <Card className='p-5 d-flex flex-column align-items-center hero-card bg-light w-75 border border-sucess'>
-            <h1 className='text-center mb-4 text-sucess'> Bienvenue sur cette application MERN (MongoDB, Express, React,
+        <Card className='p-5 d-flex flex-column align-items-center hero-card bg-light w-75 border border-dark '>
+            <h1 className='text-center mb-4'> Bienvenue sur cette application MERN (MongoDB, Express, React,
                 Node.js) avec Bootstrap.</h1>
             <p className='text-center mb-4'>
             Ceci est un modèle d&lsquo; application Web full-stack construite avec

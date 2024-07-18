@@ -90,8 +90,6 @@ export const google = async (req, res, next) => {
 
 
 export const signout = (req, res) => {
-  console.log(req.body);
-  res.json({
-    message: "Déconnexion réussie",
-  });
-};
+  res.clearCookie('access_token').status(200).json('Signout success!');
+}
+

@@ -3290,4 +3290,83 @@ const handleDeleteAccount = async () => {
 
 ## côté api
 
-### 
+### authRoute.js
+
+````
+import { display, signin, signup,google, signout } from '../controllers/authControllers.js';
+
+//....
+
+router.get('/signout', signout);
+````
+
+### authController.js
+
+````
+export const signout = (req, res) => {
+    res.clearCookie('access_token').status(200).json('Signout success!');
+}
+````
+
+### test
+
+GET: localhost:3000/api/auth/signout
+
+"Signout success!"
+
+## côté client
+
+### userSlice.js
+
+````
+    signOut: (state) => {
+      state.currentUser = null;
+      state.loading = false;
+      state.error = false;
+    },
+````
+
+````
+  export const {
+    signInStart,
+    signInSuccess,
+    signInFailure,
+    updateUserFailure,
+    updateUserStart,
+    updateUserSuccess,
+    deleteUserFailure,
+    deleteUserStart,
+    deleteUserSuccess,
+    signOut,
+  } = userSlice.actions;
+````
+
+### Profile.jsx
+
+````
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+  signOut
+} from "../redux/userSlice";
+````
+
+````
+ const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/signout');
+      dispatch(signOut())
+    } catch (error) {
+      console.log(error);
+    }
+  };
+````  
+
+````
+ <span className="btn text-danger " onClick={handleSignOut} >Déconnexion</span>
+
+````

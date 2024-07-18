@@ -19,6 +19,7 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
+  signOut
 } from "../redux/userSlice";
 
 export default function Profile() {
@@ -150,19 +151,25 @@ export default function Profile() {
         method: 'DELETE',
       });
       const data = await res.json();
-      console.log('Réponse suppression:', data);
-      if (data.success === false) {
+        if (data.success === false) {
         dispatch(deleteUserFailure(data));
         return;
       }
       dispatch(deleteUserSuccess(data));
       navigate("/"); 
     } catch (error) {
-      console.error('Erreur suppression:', error);
       dispatch(deleteUserFailure(error));
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/signout');
+      dispatch(signOut())
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const { username, email, password, passwordConfirm } = formData;
 
@@ -318,7 +325,7 @@ export default function Profile() {
         </Button>
         <div className="d-flex justify-content-between mt-3">
           <span className="btn text-danger " onClick={handleDeleteAccount} >Supprimer le compte</span>
-          <span className="btn text-danger " >Déconnexion</span>
+          <span className="btn text-danger " onClick={handleSignOut} >Déconnexion</span>
         </div>
         <div>
           <p className="text-danger mt-5">{localError && "Quelque chose ne va pas !"}</p>

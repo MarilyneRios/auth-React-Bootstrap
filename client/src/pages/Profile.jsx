@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import {  useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Form, Button, Image } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
@@ -15,6 +16,9 @@ import {
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
 } from "../redux/userSlice";
 
 export default function Profile() {
@@ -83,6 +87,7 @@ export default function Profile() {
     );
   };
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
  
   const fileRef = useRef(null);
@@ -136,6 +141,28 @@ export default function Profile() {
       dispatch(updateUserFailure(error));
     }
   };
+
+  // Supprimer un compte User
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      console.log('Réponse suppression:', data);
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+      navigate("/"); 
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      dispatch(deleteUserFailure(error));
+    }
+  };
+
 
   const { username, email, password, passwordConfirm } = formData;
 
@@ -290,8 +317,8 @@ export default function Profile() {
            {loading ? 'Loading...' : 'Enregistrer'}
         </Button>
         <div className="d-flex justify-content-between mt-3">
-          <span className="btn text-danger ">Supprimer le compte</span>
-          <span className="btn text-danger ">Déconnexion</span>
+          <span className="btn text-danger " onClick={handleDeleteAccount} >Supprimer le compte</span>
+          <span className="btn text-danger " >Déconnexion</span>
         </div>
         <div>
           <p className="text-danger mt-5">{localError && "Quelque chose ne va pas !"}</p>

@@ -3143,3 +3143,151 @@ import {
         </div>
 
 ````
+
+5. Loading
+
+````
+<Button
+  type="submit"
+  variant="outline-dark"
+  className="my-3 w-100"
+ disabled={loading}
+  >
+  {loading ? 'Loading...' : 'Enregistrer'}
+</Button>
+````        
+
+# Delete User
+
+## côté api
+
+### userRoute.js
+
+````
+import {display,  updateUser, deleteUser
+} from '../controllers/userController.js'
+//....
+router.get('/', display);
+router.post('/update/:id', verifyToken, updateUser);
+router.delete('/delete/:id', verifyToken, deleteUser);
+````
+
+### userController.js
+
+1. **if (req.user.id !== req.params.id)** => vérifie si l'identifiant de l'user authentifié.
+
+2. **await User.findByIdAndDelete(req.params.id);** => recherche un user par son identifiant (req.params.id) et le supprime de la base de données.
+
+3. **res.status(200).json('User has been deleted...');** : Si la suppression est réussie, une réponse avec un statut 200 (succès) est envoyée, contenant un message JSON indiquant "User has been deleted....".
+
+````
+// Supprimer le user
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id) {
+    return next(errorHandler(401, 'You can delete only your account!'));
+  }
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json('User has been deleted...');
+  } catch (error) {
+    next(error);
+  }
+}  
+````
+
+### test avec thunderClient ou insomnia...
+
+> DELETE : localhost:3000/api/user/delete/id
+response 200ok
+"User has been deleted..."
+
+> vérifier dans mongoDB
+
+## côté client
+
+### userSlice.js
+
+````
+   deleteUserStart: (state) => {
+        state.loading = true;
+      },
+      deleteUserSuccess: (state) => {
+        state.currentUser = null;
+        state.loading = false;
+        state.error = false;
+      },
+      deleteUserFailure: (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      },
+````
+````
+export const {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+} = userSlice.actions;
+````
+
+### Profile.jsx
+
+````
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+} from "../redux/userSlice";
+````
+
+````
+const handleDeleteAccount = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      console.log('Réponse suppression:', data);
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      dispatch(deleteUserFailure(error));
+    }
+  };
+
+````
+- **dispatch(deleteUserStart());** => la suppression du user a commencé (utile pour afficher un indicateur de chargement).
+
+- **const res = await fetch(/api/user/delete/${currentUser._id})** envoie une requête HTTP DELETE à l’endpoint spécifié, en utilisant l’ID de l’utilisateur actuel (currentUser._id)
+
+- **const data = await res.json();** =>  convertit la réponse en un objet JSON
+
+- **if (data.success === false) {dispatch(deleteUserFailure(data));}** => la suppression a échoué. Donc, deleteUserFailure(data) est appelé pour gérer l’échec.
+
+-**dispatch(deleteUserSuccess(data));** => la suppression réussit donc, deleteUserSuccess(data) est appelé pour gérer le succès.
+
+- **dispatch(deleteUserFailure(error));** => une erreur est apparue.
+
+````
+<span className="btn text-danger " onClick={handleDeleteAccount} >Supprimer le compte</span>
+
+````
+
+# signOut User
+
+## côté api
+
+### 

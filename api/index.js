@@ -4,19 +4,36 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js'
 import authRoutes from './routes/authRoute.js';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 
+// Charger les variables d'environnement à partir du fichier .env
 dotenv.config();
+
+// Connexion à la base de données
 connectDB();
 
+
+// Initialiser express et définir le port
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware pour parser le JSON
+// Obtenir le chemin absolu du répertoire courant
+const __dirname = path.resolve();
+
+// Servir les fichiers statiques du dossier 'client/dist'
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+// Gérer toutes les autres routes en renvoyant 'index.html'
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
+
+// Middleware pour parser (convertir) le JSON
 app.use(express.json()); 
-// Middleware pour parser cookies
+// Middleware pour parser (convertir) cookies
 app.use(cookieParser());
 
-//Routes
+//Routes de l'API pour les utilisateurs
 app.use('/api/user', userRoutes);  
 app.use('/api/auth', authRoutes);
 

@@ -3637,3 +3637,65 @@ export default Header;
         </Col>
       </Row>
 ````      
+
+# Préparation Render
+
+## côté serveur
+
+### package.json
+
+- npm install --prefix client : Cette commande installe toutes les dépendances répertoriées dans le fichier package.json du répertoire client. L’option --prefix client indique à npm de naviguer vers le répertoire client et d’y exécuter la commande npm install.
+
+- npm run build --prefix client : Cette commande exécute le script build défini dans le fichier package.json du répertoire client. Le script build est généralement utilisé pour compiler ou transpiler votre code source en un format qui peut être exécuté par le navigateur.
+````
+ "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon api/index.js",
+    "start": "node api/index.js",
+    "build": "npm install && npm install --prefix client && npm run build --prefix client"
+  },
+````
+
+### index.js
+
+1. Le chemin absolu du répertoire courant => app.use(express.static(path.join(__dirname, '/client/dist')));
+
+2. Crée un chemin absolu vers le répertoire => app.use(express.static(path.join(__dirname, '/client/dist')));
+
+3. Envoie le fichier index.html situé dans le répertoire Situé dans le répertoire /client/dist en réponse à la requête => res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+
+
+````
+import path from 'path';
+//....
+// Obtenir le chemin absolu du répertoire courant
+const __dirname = path.resolve();
+
+// Servir les fichiers statiques du dossier 'client/dist'
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+// Gérer toutes les autres routes en renvoyant 'index.html'
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
+````
+
+### Sur le site Render
+
+1. web service
+
+2. Sélectioner le dossier
+
+3. Remplir
+
+> Name: mern-auth-boostrap 
+> Region: Frankfurt (EU Central) 
+> Branch: main Root Directory 
+> Runtime: Node Build 
+> Command: npm run build Start 
+> Command: npm start
+
+tester 5 min après le temps que tout soit disponible en ligne
+
+### firebase
+

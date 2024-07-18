@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { Form, Button, Image } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUnlock } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import {
   getDownloadURL,
   getStorage,
@@ -324,8 +326,8 @@ export default function Profile() {
            {loading ? 'Loading...' : 'Enregistrer'}
         </Button>
         <div className="d-flex justify-content-between mt-3">
-          <span className="btn text-danger " onClick={handleDeleteAccount} >Supprimer le compte</span>
-          <span className="btn text-danger " onClick={handleSignOut} >Déconnexion</span>
+          <span className="btn text-danger " onClick={handleDeleteAccount} ><FaTrashAlt /> Supprimer le compte</span>
+          <span className="btn text-danger " onClick={handleSignOut} ><FaUnlock /> Déconnexion</span>
         </div>
         <div>
           <p className="text-danger mt-5">{localError && "Quelque chose ne va pas !"}</p>

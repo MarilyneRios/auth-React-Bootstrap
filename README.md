@@ -3576,3 +3576,64 @@ export default Header;
 ````
 
 ## message d'erreur en anglais page connexion qui viennent de l'api
+
+````
+ const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.email || !formData.password) {
+      dispatch(signInFailure("Veuillez remplir tous les champs."));
+      return;
+    }
+  
+    try {
+      dispatch(signInStart());
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await res.json();
+  
+      if (data.success === false) {
+        const errorMessage = translateErrorMessage(data.message); // Utiliser une fonction de traduction
+        dispatch(signInFailure(errorMessage));
+        return;
+      }
+  
+      dispatch(signInSuccess(data));
+      navigate("/");
+    } catch (error) {
+      dispatch(signInFailure("Le mot de passe ou l'email est incorrect, veuillez réessayer.")); // Message générique
+    }
+  };
+  
+  const translateErrorMessage = (message) => {
+    const errorTranslations = {
+      "Invalid email or password": "Email ou mot de passe invalide",
+      "User not found": "Utilisateur non trouvé",
+      "wrong credentials":"Le mot de passe ou l'email est incorrect",
+    };
+    return errorTranslations[message] || "Une erreur est survenue, veuillez réessayer.";
+  };
+
+````
+````
+      <Row className="py-3">
+        <Col>
+          Avez-vous un compte ?{" "}
+          <Link to="/sign-up" className="text-dark">
+            Inscription
+          </Link>
+          {error && (
+            <p className="text-danger mt-5">
+              {typeof error === "string"
+                ? error
+                : "Une erreur est survenue, veuillez réessayer."}
+            </p>
+          )}
+        </Col>
+      </Row>
+````      

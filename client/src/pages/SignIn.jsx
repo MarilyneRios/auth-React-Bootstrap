@@ -17,14 +17,13 @@ export default function SignIn() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-      setError("Veuillez remplir tous les champs.");
+      dispatch(signInFailure("Veuillez remplir tous les champs."));
       return;
     }
-
+  
     try {
       dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
@@ -34,20 +33,31 @@ export default function SignIn() {
         },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await res.json();
-
+  
       if (data.success === false) {
-        dispatch(signInFailure(data.message)); // Dispatch failure with error message
+        const errorMessage = translateErrorMessage(data.message); // Utiliser une fonction de traduction
+        dispatch(signInFailure(errorMessage));
         return;
       }
-
-      dispatch(signInSuccess(data)); // Dispatch success with data
-      navigate("/"); // Navigate to homepage on successful sign-in
+  
+      dispatch(signInSuccess(data));
+      navigate("/");
     } catch (error) {
-      dispatch(signInFailure(error.message)); // Dispatch failure with error object
+      dispatch(signInFailure("Le mot de passe ou l'email est incorrect, veuillez réessayer.")); // Message générique
     }
   };
+  
+  const translateErrorMessage = (message) => {
+    const errorTranslations = {
+      "Invalid email or password": "Email ou mot de passe invalide",
+      "User not found": "Utilisateur non trouvé",
+      "wrong credentials":"Le mot de passe ou l'email est incorrect",
+    };
+    return errorTranslations[message] || "Une erreur est survenue, veuillez réessayer.";
+  };
+  
 
   return (
     <FormContainer>
@@ -101,9 +111,7 @@ export default function SignIn() {
           {loading ? "Chargement..." : "Se connecter"}
         </Button>
 
-            <OAuth/>
-
-    
+        <OAuth />
       </Form>
 
       <Row className="py-3">
@@ -114,7 +122,9 @@ export default function SignIn() {
           </Link>
           {error && (
             <p className="text-danger mt-5">
-              {typeof error === "string" ? error : error.message}
+              {typeof error === "string"
+                ? error
+                : "Une erreur est survenue, veuillez réessayer."}
             </p>
           )}
         </Col>

@@ -10,7 +10,9 @@ import OAuth from "../components/OAuth";
 export default function SignIn() {
   const [formData, setFormData] = useState({});
   const [visiblePassword, setVisiblePassword] = useState(false);
+
   const { loading, error } = useSelector((state) => state.user);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -19,6 +21,7 @@ export default function SignIn() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.email || !formData.password) {
       dispatch(signInFailure("Veuillez remplir tous les champs."));
       return;
@@ -111,7 +114,7 @@ export default function SignIn() {
           {loading ? "Chargement..." : "Se connecter"}
         </Button>
 
-        <OAuth />
+        <OAuth disabled={loading} label={"Continue avec Google"}/>
       </Form>
 
       <Row className="py-3">

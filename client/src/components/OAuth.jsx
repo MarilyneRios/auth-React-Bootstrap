@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button,  } from "react-bootstrap";
 import { signInSuccess } from '../redux/userSlice';
 
-export default function OAuth() {
+export default function OAuth(  {label}) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -56,7 +56,7 @@ export default function OAuth() {
             height="25"
             width="25"
           />
-      Continue with google
+        {label}
     </Button>
   );
 }

@@ -3682,20 +3682,34 @@ app.get('*', (req, res) => {
 
 ### Sur le site Render
 
-1. web service
+1. + New > web service
 
 2. Sélectioner le dossier
 
 3. Remplir
 
 > Name: mern-auth-boostrap 
-> Region: Frankfurt (EU Central) 
-> Branch: main Root Directory 
+> Region: sélectionner la plus proche
+> Branch: main 
+> Root Directory :
 > Runtime: Node Build 
-> Command: npm run build Start 
+> Command: npm run build 
 > Command: npm start
+
+> variables env:
+
+- PORT
+- VITE_DB_CONNECTION_STRING
+- JWT_SECRET
+- VITE_FIREBASE_APIKEY
+- ...
 
 tester 5 min après le temps que tout soit disponible en ligne
 
 ### firebase
 
+> Authentication
+
+> Domaines autorisés
+
+> Ajouter un domaine

@@ -20,22 +20,25 @@ const port = process.env.PORT || 3000;
 // Obtenir le chemin absolu du répertoire courant
 const __dirname = path.resolve();
 
+// Middleware pour parser (convertir) le JSON
+app.use(express.json()); 
+// Middleware pour parser (convertir) cookies
+app.use(cookieParser());
+
 // Servir les fichiers statiques du dossier 'client/dist'
 app.use(express.static(path.join(__dirname, '/client/dist')));
+
+
+
+//Routes de l'API pour les utilisateurs
+app.use('/api/user', userRoutes);  
+app.use('/api/auth', authRoutes);
 
 // Gérer toutes les autres routes en renvoyant 'index.html'
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 });
 
-// Middleware pour parser (convertir) le JSON
-app.use(express.json()); 
-// Middleware pour parser (convertir) cookies
-app.use(cookieParser());
-
-//Routes de l'API pour les utilisateurs
-app.use('/api/user', userRoutes);  
-app.use('/api/auth', authRoutes);
 
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {

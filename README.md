@@ -3425,6 +3425,87 @@ export default function About() {
 
 # Bugs 
 
+## pbm modification partielle du profil
+
+### userController.js
+
+````
+// Mise à jour du user
+export const updateUser = async (req, res, next) => {
+  // Sécurité : vérification user
+  if (req.user.id !== req.params.id) {
+    return next(errorHandler(401, 'You can update only your account!'));
+  }
+
+  try {
+    const updatedFields = {};
+
+    if (req.body.username) {
+      updatedFields.username = req.body.username;
+    }
+    if (req.body.email) {
+      updatedFields.email = req.body.email;
+    }
+    if (req.body.password) {
+      updatedFields.password = bcryptjs.hashSync(req.body.password, 10);
+    }
+    if (req.body.profilePicture) {
+      updatedFields.profilePicture = req.body.profilePicture;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: updatedFields },
+      { new: true }
+    );
+
+    const { password, ...rest } = updatedUser._doc;
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error);
+  }
+}
+````
+### Profile.jsx
+
+````
+ // Fonction de soumission du formulaire
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.passwordConfirm) {
+      setLocalError("Les mots de passe ne correspondent pas !");
+      return;
+    }
+    
+  // si password est vide ne pas prendre en compte
+    const updatedData = { ...formData };
+    if (!updatedData.password) {
+      delete updatedData.password;
+      delete updatedData.passwordConfirm;
+    }
+  
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data));
+        return;
+      }
+      dispatch(updateUserSuccess(data));
+      setUpdateSuccess(true);
+    } catch (error) {
+      dispatch(updateUserFailure(error));
+    }
+  };
+  ````
+
 ## header en petit écran pbm btns au lieu de la photo
 
 ````
